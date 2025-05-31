@@ -1,1 +1,0 @@
-# logica de los recorridos

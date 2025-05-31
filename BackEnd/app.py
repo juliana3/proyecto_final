@@ -1,1 +1,1 @@
-#codigo principal con flask
+#Inicia Flask y se definen rutas de APIs y de vistas
