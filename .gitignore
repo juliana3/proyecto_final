@@ -1,0 +1,16 @@
+# Ignorar entornos virtuales
+.venv/
+
+# Ignorar archivos temporales y de prueba
+temporales/
+
+# Ignorar bases de datos locales
+BackEnd/db/
+
+# Ignorar __pycache__ y archivos compilados
+__pycache__/
+*.pyc
+
+# Ignorar archivos del sistema (Windows/macOS)
+.DS_Store
+Thumbs.db
