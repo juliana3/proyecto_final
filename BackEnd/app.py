@@ -2,7 +2,7 @@
 
 from flask import Flask, request, redirect, url_for, session, render_template
 import login
-import usuarios
+from db import usuarios
 
 app = Flask(__name__)
 app.secret_key = 'f1144cc94278494f8b3a61a689a658a2' #clave para la sesion
@@ -31,7 +31,7 @@ def login_route():
 def dashboard():
     if 'usuario' in session:
         lista_usuarios = usuarios.verUsuarios()
-        return render_template('usuarios.html', usuarios=lista_usuarios)
+        return render_template('dashboard.html', usuarios=lista_usuarios)
     else:
         return redirect(url_for('login_route'))
 

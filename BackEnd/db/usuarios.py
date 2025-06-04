@@ -1,13 +1,15 @@
 import sqlite3 as sql
+import os
+ruta_bd = os.path.join(os.path.dirname(__file__), 'usuarios.db')
 
 def crearDB():
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos (se crea si no existe)
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos (se crea si no existe)
     print("Base de datos creada exitosamente")
     conn.commit()  # Guardar los cambios
     conn.close() # Cerrar la conexión
 
 def crearTabla():
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS usuarios (
@@ -24,7 +26,7 @@ def crearTabla():
 
 #CRUD
 def crearUsuario(dni,nombre,email,contrasena):
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
 
     #verificar si el usuario ya existe mediante el mail
@@ -46,7 +48,7 @@ def crearUsuario(dni,nombre,email,contrasena):
     conn.close()  # Cerrar la conexión
 
 def verUsuarios():
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
 
     
@@ -63,8 +65,10 @@ def verUsuarios():
     conn.commit()  # Guardar los cambios
     conn.close()  # Cerrar la conexión
 
+    return usuarios
+
 def buscarUsuario(dni):
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
 
     
@@ -82,7 +86,7 @@ def buscarUsuario(dni):
     conn.close()  # Cerrar la conexión
 
 def actualizarUsuario(dni, new_email, new_contrasena):
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
 
     
@@ -102,7 +106,7 @@ def actualizarUsuario(dni, new_email, new_contrasena):
     conn.close()  # Cerrar la conexión
 
 def eliminarUsuario(dni):
-    conn = sql.connect('db/usuarios.db')  # Conectar a la base de datos
+    conn = sql.connect(ruta_bd)  # Conectar a la base de datos
     cursor = conn.cursor()  # Crear un cursor para ejecutar comandos SQL
 
     instruccion = "DELETE FROM usuarios WHERE dni = ?"
