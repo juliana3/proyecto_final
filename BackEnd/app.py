@@ -2,6 +2,7 @@
 
 from flask import Flask, request, redirect, url_for, session, render_template
 import login
+import usuarios
 
 app = Flask(__name__)
 app.secret_key = 'f1144cc94278494f8b3a61a689a658a2' #clave para la sesion
@@ -29,16 +30,37 @@ def login_route():
 @app.route('/dashboard')
 def dashboard():
     if 'usuario' in session:
-        return f"Bienvenido {session['usuario']} al panel de configuraciones."
+        lista_usuarios = usuarios.verUsuarios()
+        return render_template('usuarios.html', usuarios=lista_usuarios)
     else:
         return redirect(url_for('login_route'))
-    
 
+
+@app.route('/eliminar_usuario', methods = ['POST'])
+def eliminar_usuario():
+    ids_seleccionados = request.form.getlist('ids')
+
+    for id in ids_seleccionados:
+        usuarios.eliminarUsuario(id)
+    
+    return redirect(url_for('dashboard'))
+
+@app.route('/agregar_usuario', methods = ['POST'])
+def agregar_usuario():
+    dni = request.form['dni']
+    nombre = request.form['nombre']
+    email = request.form['email']
+    contrasena = request.form['contrasena']
+
+    usuarios.crearUsuario(dni,nombre,email,contrasena)
+
+    return redirect(url_for('dashboard'))
+
+    
 @app.route('/logout')
 def logout():
     session.pop('usuario', None)
     return redirect(url_for('login_route'))
-
 
 
 
