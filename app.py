@@ -1,8 +1,10 @@
 #Inicia Flask y se definen rutas de APIs y de vistas
 
-from flask import Flask, request, redirect, url_for, session, render_template
-import login
-from db import usuarios
+from flask import Flask, request, redirect, url_for, session, render_template, flash
+import os
+from werkzeug.utils import secure_filename
+import BackEnd.login as login
+from BackEnd.db import usuarios
 
 app = Flask(__name__)
 app.secret_key = 'f1144cc94278494f8b3a61a689a658a2' #clave para la sesion
@@ -22,7 +24,9 @@ def login_route():
             session['usuario'] = usuario
             return redirect(url_for('dashboard'))
         else:
-            return "Usuario o contraseña incorrectos."
+            flash("Usuario o contraseña incorrectos.")
+            return redirect(url_for('login_route'))
+        
     
     return render_template('login.html')
 
@@ -57,6 +61,44 @@ def agregar_usuario():
     return redirect(url_for('dashboard'))
 
     
+# Carpeta donde se guardan los archivos subidos
+CARPETA_KML = os.path.join(os.path.dirname(__file__), 'Data')
+ALLOWED_EXTENSIONS = {'kml'}
+
+#validar que la extension del archivo sea valida
+def extension_valida(nombre_archivo):
+    return '.' in nombre_archivo and nombre_archivo.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+@app.route('/agregar_recorrido', methods = ['POST'])
+def agregar_recorrido():
+    if 'archivos_kml' not in request.files:
+        flash('No se enviaron los archivos.')
+        return redirect(url_for('dashboard'))
+    
+    archivos = request.files.getlist('archivos_kml')
+    print("Cantidad de archivos recibidos:", len(archivos))
+    for a in archivos:
+        print("→", a.filename)
+
+    for archivo in archivos:
+        if archivo.filename == '':
+            flash('No se seleccionó ningún archivo.')
+
+        if archivo and extension_valida(archivo.filename):
+            nombre_seguro = secure_filename(archivo.filename)
+            ruta = os.path.join(CARPETA_KML, nombre_seguro)
+            archivo.save(ruta)
+            flash('Archivo subido exitosamente.')
+        else:
+            flash('Formato de archivo no permitido. Solo se permiten archivos KML.')
+
+    
+
+    
+
+    return redirect(url_for('dashboard'))
+
+
 @app.route('/logout')
 def logout():
     session.pop('usuario', None)

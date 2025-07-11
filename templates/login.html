@@ -1,4 +1,4 @@
-#aca es donde vamos a poner usuario y contraseña para poder acceder al dashboard
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +7,14 @@
     <title>LOGIN</title>
 </head>
 <body>
+    {% with mensajes = get_flashed_messages() %}
+        {% if mensajes %}
+            {% for m in mensajes %}
+                <li style="color: red;">{{ m }}</li>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
     <form method="post">
         <input type = "number" name = "usuario" placeholder="DNI" required>
 
