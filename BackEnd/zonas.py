@@ -14,6 +14,46 @@ area_servicio = None
 # Variable global para el polígono de los límites de Santa Fe
 santa_fe_limites = None
 
+
+def cargar_poligono_santa_fe(ruta_kml_santa_fe):
+    """
+    Carga un archivo KML y extrae el polígono que representa los límites de la ciudad de Santa Fe.
+
+    Args:
+        ruta_kml_santa_fe: La ruta al archivo KML con los límites de la ciudad.
+    """
+    global santa_fe_limites
+    
+    if not os.path.exists(ruta_kml_santa_fe):
+        print(f"ERROR: Archivo KML de límites de Santa Fe no encontrado en la ruta: {ruta_kml_santa_fe}")
+        return
+
+    try:
+        with open(ruta_kml_santa_fe, 'rb') as kml_file:
+            root = parser.parse(kml_file).getroot()
+        
+        print("DEBUG: KML de límites de Santa Fe cargado. Buscando polígono...")
+        document = root.Document
+        
+        if document is not None:
+            for placemark in document.findall('.//{http://www.opengis.net/kml/2.2}Placemark'):
+                if hasattr(placemark, 'Polygon') and placemark.Polygon is not None:
+                    coords_text = placemark.Polygon.outerBoundaryIs.LinearRing.coordinates.text
+                    coords_list = [tuple(map(float, c.split(','))) for c in coords_text.strip().split()]
+                    
+                    polygon_coords = [(c[0], c[1]) for c in coords_list]
+                    santa_fe_limites = Polygon(polygon_coords)
+                    print(f"Polígono de límites de Santa Fe cargado exitosamente.")
+                    return
+        print("Advertencia: No se encontró un polígono en el KML de límites de Santa Fe.")
+
+    except FileNotFoundError:
+        print(f"Error: El archivo KML de límites no se encontró en la ruta: {ruta_kml_santa_fe}.")
+    except Exception as e:
+        print(f"Error al cargar o parsear el KML de límites: {e}")
+        import traceback
+        traceback.print_exc()
+
 def cargar_kml_zonas(ruta_archivo_kml):
     """
     Carga un archivo KML y extrae los polígonos que representan las zonas de recolección
@@ -99,6 +139,7 @@ def obtener_zona_recoleccion(latitud, longitud):
             return zona['nombre']
     return None
 
+
 def es_de_santa_fe(latitud, longitud):
     """
     Verifica si un punto está dentro de los límites de la ciudad de Santa Fe.
@@ -109,30 +150,23 @@ def es_de_santa_fe(latitud, longitud):
     """
     global santa_fe_limites
     if santa_fe_limites is None:
-        # Definir los límites de la ciudad de Santa Fe (valores más precisos)
-        # Esto es un polígono de prueba más detallado.
-        limites = [
-            (-60.70862, -31.5635),  
-            (-60.66622, -31.59801),  
-            (-60.68918, -31.64419),  
-            (-60.72693, -31.67182),  
-            (-60.73795, -31.65453),  
-            (-60.73926, -31.64104),  
-            (-60.72235, -31.61685),  
-            (-60.75133, -31.58019),
-            (-60.70862, -31.5635)   # Cerrar el polígono
-        ]
-        santa_fe_limites = Polygon(limites)
+        print("ERROR: El polígono de Santa Fe no ha sido cargado. No se puede verificar la ubicación.")
+        return False
 
     punto = Point(longitud, latitud)
     return santa_fe_limites.contains(punto)
+
+
 
 if __name__ == "__main__":
     # ... (El código de prueba principal que ya tenías)
     ruta_directorio_actual = os.path.dirname(os.path.abspath(__file__))
     ruta_base_proyecto = os.path.dirname(ruta_directorio_actual)
     ruta_kml_zonas = os.path.join(ruta_base_proyecto, 'Data', 'ZONA_LIMITE.kml')
+    ruta_kml_limites = os.path.join(ruta_base_proyecto, 'Data', 'poligono-santa-fe.kml')
 
+    print(f"Intentando cargar límites desde: {ruta_kml_limites}")
+    cargar_poligono_santa_fe(ruta_kml_limites)
     print(f"Intentando cargar KML desde: {ruta_kml_zonas}")
     cargar_kml_zonas(ruta_kml_zonas)
     

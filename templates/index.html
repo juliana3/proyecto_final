@@ -1,12 +1,64 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Verificación de Ubicación</title>
+    <!-- Tailwind CSS CDN para un estilo simple y limpio -->
+    <script src="{{ url_for('static', filename='geolocalizacion.js') }}"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
 </head>
-<body>
-    <h1>INDEX</h1>
-    <script src="/Static/geolocalizacion.js"></script>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+
+    <!-- Contenedor principal centrado -->
+    <div class="bg-white rounded-xl shadow-lg p-6 md:p-10 w-full max-w-md">
+        <h2 class="text-2xl md:text-3xl font-extrabold text-gray-800 mb-6 text-center">
+            Verifica el servicio en tu dirección
+        </h2>
+        <div id="message-box" class="mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 hidden"></div>
+        <form id="address-form" class="mt-6 hidden">
+            <label for="address-input" class="block text-gray-700 font-semibold mb-2">Ingresa tu dirección para consultar por el camión:</label>
+            <input type="text" id="address-input" name="address" required class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 mb-4">
+            <button type="submit" class="w-full bg-blue-500 text-white font-bold py-2 rounded-lg hover:bg-blue-600 transition-colors">Verificar Ubicación</button>
+        </form>
+    </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const messageBox = document.getElementById('message-box');
+            const addressForm = document.getElementById('address-form');
+            const addressInput = document.getElementById('address-input');
+
+            // Este script ahora solo maneja el formulario de dirección
+            addressForm.addEventListener('submit', async function(event) {
+                event.preventDefault();
+                const address = addressInput.value;
+                messageBox.textContent = 'Consultando tu dirección...';
+                
+                try {
+                    // Envía la dirección de texto directamente al backend
+                    const response = await fetch('/consultar_direccion', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({ direccion: address })
+                    });
+
+                    const data = await response.json();
+                    
+                    // Muestra la respuesta del backend
+                    messageBox.textContent = data.mensaje;
+
+                } catch (error) {
+                    console.error('Error:', error);
+                    messageBox.textContent = 'Hubo un error al procesar tu solicitud.';
+                }
+            });
+        });
+    </script>
 </body>
 </html>

@@ -53,47 +53,37 @@ function obtenerUbicacion() {
  * @param {number} latitud - La latitud del usuario.
  * @param {number} longitud - La longitud del usuario.
  */
+
 function verificarUbicacionEnBackend(latitud, longitud) {
-    // Usar Fetch API para enviar los datos por POST al servidor
     fetch('/verificar_ubicacion', {
         method: 'POST',
         headers: {
-            'Content-Type': 'application/json',
+            'Content-Type': 'application/json'
         },
         body: JSON.stringify({ latitud: latitud, longitud: longitud })
     })
-    .then(response => {
-        // Si la respuesta no es exitosa, lanzar un error
-        if (!response.ok) {
-            throw new Error('La respuesta del servidor no fue exitosa. Estado: ' + response.status);
-        }
-        return response.json();
-    })
+    .then(response => response.json())
     .then(data => {
-        //  Manejar la respuesta del backend
+        const messageBox = document.getElementById('message-box');
+        const addressForm = document.getElementById('address-form');
+
         console.log("Respuesta del backend:", data);
 
-        // Validar si el usuario está en la ciudad de Santa Fe
-        if (!data.en_santa_fe) {
-            alert("Parece que no estás en la ciudad de Santa Fe. Nuestra aplicación solo funciona en esta zona.");
-            // Aquí puedes deshabilitar el formulario o redirigir al usuario
-        } 
-        // Si está en la ciudad pero no en el área de servicio
-        else if (!data.en_area_servicio) {
-            alert("Estás en Santa Fe, pero fuera de nuestra área de servicio. Por favor, ingresa una dirección completa dentro del área para usar la aplicación.");
-            // Aquí puedes mostrar un mensaje, pero se le permite al usuario ingresar una dirección
-        } 
-        // Si está en el área de servicio
-        else {
-            console.log("El usuario está en el área de servicio de Santa Fe. ¡Todo listo para continuar!");
-            // Aquí puedes habilitar el formulario o cualquier otro elemento de la UI
-            // Por ejemplo:
-            // document.getElementById('formulario-direccion').style.display = 'block';
-            alert("¡Bienvenido! Estás en nuestra área de servicio.");
+        // Si la verificación de Santa Fe es exitosa, muestra el formulario
+        if (data.en_santa_fe) {
+            messageBox.textContent = "Ubicación en Santa Fe verificada. Ahora ingresa tu dirección.";
+            messageBox.className = "mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 bg-green-500";
+            addressForm.style.display = 'block';
+        } else {
+            messageBox.textContent = "Tu ubicación no se encuentra en la ciudad de Santa Fe. Nuestra aplicación solo funciona en esta zona.";
+            messageBox.className = "mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 bg-red-500";
+            addressForm.style.display = 'none';
         }
     })
     .catch(error => {
         console.error('Error al enviar ubicación al backend:', error);
-        alert("Ocurrió un error al verificar tu ubicación. Por favor, intenta de nuevo más tarde.");
+        const messageBox = document.getElementById('message-box');
+        messageBox.textContent = "Ocurrió un error al verificar tu ubicación.";
+        messageBox.className = "mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 bg-red-500";
     });
 }
