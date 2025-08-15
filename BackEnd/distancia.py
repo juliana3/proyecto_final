@@ -11,9 +11,7 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
         Args:
             latitud_usuario (float): Latitud actual del usuario.
             longitud_usuario (float): Longitud actual del usuario.
-            posiciones_camiones (list): Una lista de diccionarios con la posición
-                                        y estado de todos los camiones de una zona,
-                                        devuelta por el simulador.
+            posiciones_camiones (list): Una lista de diccionarios con la posición y estado de todos los camiones de una zona devuelta por el simulador.
 
         Returns:
             dict: Un diccionario con la información del camión más cercano y el tiempo
