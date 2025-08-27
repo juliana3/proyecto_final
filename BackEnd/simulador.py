@@ -1,6 +1,7 @@
 #Aca se simula el movimiento de los camiones de recoleccion de basura
 
 import os
+import logging
 import random
 from datetime import datetime, timedelta, time
 
@@ -8,6 +9,13 @@ from datetime import datetime, timedelta, time
 from pykml import parser
 from shapely.geometry import LineString
 from geopy.distance import geodesic
+
+# Configuración del logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 
 #Definimos un diccionario para almacenar las rutas
 #la estructura es {'A1_ruta1': Linestring, 'A1_ruta2': Linestring....}
@@ -31,13 +39,13 @@ def cargar_rutas_kml(ruta_archivos):
     """ Carga todos los archivos KML de las rutas de los camiones desde el directorio de datos y los almacenaa en el diccionario rutas_kml"""
 
     global rutas_kml
-    print("INFO: Cargando rutas kml")
+    logging.info("Cargando rutas kml")
 
     #creamos la ruta absoluta al directorio donde estan los recorridos
     rutas_dir = os.path.join(ruta_archivos, 'Recorridos')
 
     if not os.path.isdir(rutas_dir):
-        print(f"ERR: No se encontro el directorio: {rutas_dir}")
+        logging.error(f"No se encontro el directorio: {rutas_dir}")
         return
     
     for filename in os.listdir(rutas_dir):
@@ -59,10 +67,10 @@ def cargar_rutas_kml(ruta_archivos):
                 #Usamos el nombre del archivo como clave
                 nombre_ruta = os.path.splitext(filename)[0]
                 rutas_kml[nombre_ruta] = line
-                print(f"INFO: Ruta '{nombre_ruta}' cargada con exito")
+                logging.info(f"Ruta '{nombre_ruta}' cargada con exito")
 
             except Exception as e:
-                print(f"ERR: No se pudo procesar el archivo kml '{filename}': {e}")
+                logging.error(f"No se pudo procesar el archivo kml '{filename}': {e}")
 
 
 
@@ -96,7 +104,7 @@ def inicializar_simulacion(ruta_archivos):
 
             simaulacion_data[clave_simulacion] = duracion_timedelta
 
-    print("INFO: Simulacion inicializada. Duraciones aleatorias asignadas por zona")
+    logging.info("Simulacion inicializada. Duraciones aleatorias asignadas por zona")
 
 
 
@@ -153,7 +161,7 @@ def obtener_posicion_camion(zona,hora_actual):
         duracion_total = simaulacion_data.get(clave_simulacion)
 
         if not linea_recorrido or not duracion_total:
-            print(f"ERR: No se encontro la ruta o datos de simulacion para {clave_simulacion}")
+            logging.error(f"No se encontro la ruta o datos de simulacion para {clave_simulacion}")
             posiciones_camiones.append({'estado': 'error_configuracion', 'camion_id': camion_id})
             continue
 

@@ -3,11 +3,18 @@
 from datetime import datetime
 from flask import Flask, jsonify, request, render_template
 import os
+import logging
 
 from BackEnd.zonas import cargar_kml_zonas, esta_en_area_servicio, es_de_santa_fe, cargar_poligono_santa_fe, obtener_zona_recoleccion
 from BackEnd.geocodificacion import geocodificar_direccion
 from BackEnd import simulador
 from BackEnd import distancia
+
+# Configuración del logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 app = Flask(__name__)
 app.secret_key = 'f1144cc94278494f8b3a61a689a658a2' #clave para la sesion
@@ -21,16 +28,16 @@ DATA_DIR = os.path.join(PROJECT_ROOT, 'Data')
 ruta_kml_zonas = os.path.join(DATA_DIR, 'ZONA_LIMITE.kml')
 ruta_kml_limites_santa_fe = os.path.join(DATA_DIR, 'poligono-santa-fe.kml')
 
-print("INFO: Cargando datos geográficos...")
+logging.info("Cargando datos geográficos...")
 cargar_poligono_santa_fe(ruta_kml_limites_santa_fe)
 cargar_kml_zonas(ruta_kml_zonas)
-print("INFO: Carga de KML finalizada.")
+logging.info("Carga de KML finalizada.")
 
 
 # Inicializamos el simulador al inicio del script, en lugar de usar un decorador
-print("INFO: Inicializando simulador...")
+logging.info("Inicializando simulador...")
 simulador.inicializar_simulacion(DATA_DIR)
-print("INFO: Simulador listo. La aplicación puede empezar a recibir peticiones.")
+logging.info("Simulador listo. La aplicación puede empezar a recibir peticiones.")
 
 
 # Rutas de la API

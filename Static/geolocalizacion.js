@@ -1,6 +1,3 @@
-//geolocalizacion.js
-
-
 // Este script se encarga de obtener la ubicación del usuario a través del navegador,
 // enviarla al backend para su validación y mostrar un mensaje apropiado.
 

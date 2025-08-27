@@ -1,7 +1,14 @@
 #Calculo de la distancia entre el camion y el usuario
+import logging
 from datetime import timedelta
 from geopy.distance import geodesic
 from shapely.geometry import Point, LineString
+
+# Configuración del logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
 
 def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_camiones):
     """

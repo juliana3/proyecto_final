@@ -3,9 +3,17 @@ from pykml import parser
 from lxml import etree
 from shapely.geometry import Point, Polygon
 import os
+import logging
 
 # Importa la función de geocodificación desde el archivo geolocalizacion.py
 from BackEnd.geocodificacion import geocodificar_direccion
+
+# Configuración del logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s [%(levelname)s] %(message)s"
+)
+
 
 # Lista para almacenar las zonas de recolección
 zonas_recoleccion = []
@@ -25,14 +33,14 @@ def cargar_poligono_santa_fe(ruta_kml_santa_fe):
     global santa_fe_limites
     
     if not os.path.exists(ruta_kml_santa_fe):
-        print(f"ERROR: Archivo KML de límites de Santa Fe no encontrado en la ruta: {ruta_kml_santa_fe}")
+        logging.error(f"Archivo KML de límites de Santa Fe no encontrado en la ruta: {ruta_kml_santa_fe}")
         return
 
     try:
         with open(ruta_kml_santa_fe, 'rb') as kml_file:
             root = parser.parse(kml_file).getroot()
         
-        print("DEBUG: KML de límites de Santa Fe cargado. Buscando polígono...")
+        logging.debug("KML de límites de Santa Fe cargado. Buscando polígono...")
         document = root.Document
         
         if document is not None:
@@ -43,14 +51,14 @@ def cargar_poligono_santa_fe(ruta_kml_santa_fe):
                     
                     polygon_coords = [(c[0], c[1]) for c in coords_list]
                     santa_fe_limites = Polygon(polygon_coords)
-                    print(f"Polígono de límites de Santa Fe cargado exitosamente.")
+                    logging.info(f"Polígono de límites de Santa Fe cargado exitosamente.")
                     return
-        print("Advertencia: No se encontró un polígono en el KML de límites de Santa Fe.")
+        logging.warning("No se encontró un polígono en el KML de límites de Santa Fe.")
 
     except FileNotFoundError:
-        print(f"Error: El archivo KML de límites no se encontró en la ruta: {ruta_kml_santa_fe}.")
+        logging.error(f"El archivo KML de límites no se encontró en la ruta: {ruta_kml_santa_fe}.")
     except Exception as e:
-        print(f"Error al cargar o parsear el KML de límites: {e}")
+        logging.error(f"Error al cargar o parsear el KML de límites: {e}")
         import traceback
         traceback.print_exc()
 
@@ -68,14 +76,14 @@ def cargar_kml_zonas(ruta_archivo_kml):
         with open(ruta_archivo_kml, 'rb') as kml_file:
             root = parser.parse(kml_file).getroot()
         
-        print("DEBUG: KML cargado. Buscando polígonos...")
+        logging.debug("KML cargado. Buscando polígonos...")
         
         # En tu KML, el documento principal está anidado dentro de la etiqueta <kml>.
         # Accedemos a él directamente.
         document = root.Document
         
         if document is not None:
-            print(f"DEBUG: Encontrado el Documento principal: '{document.name}'. Procesando sus sub-características...")
+            logging.debug(f"Encontrado el Documento principal: '{document.name}'. Procesando sus sub-características...")
             
             # Buscamos todos los Placemarks dentro del Documento
             for placemark in document.findall('.//{http://www.opengis.net/kml/2.2}Placemark'):
@@ -94,39 +102,39 @@ def cargar_kml_zonas(ruta_archivo_kml):
                     feature_name_clean = feature_name.upper().strip()
                     if feature_name_clean == "ZONA LÍMITE" or feature_name_clean == "ZONA LIMITE":
                         area_servicio = polygon
-                        print(f"Área de servicio '{feature_name}' cargada.")
+                        logging.info(f"Área de servicio '{feature_name}' cargada.")
                     elif feature_name_clean.startswith('A'):
                         zonas_recoleccion.append({
                             'nombre': feature_name,
                             'poligono': polygon
                         })
-                        print(f"Zona de recolección '{feature_name}' cargada.")
+                        logging.info(f"Zona de recolección '{feature_name}' cargada.")
                     else:
-                        print(f"DEBUG:   > Placemark '{feature_name}' no es un polígono de zona o límite reconocido.")
+                        logging.debug(f"> Placemark '{feature_name}' no es un polígono de zona o límite reconocido.")
                 else:
-                    print(f"DEBUG:   > Placemark '{feature_name}' no tiene una geometría de Polígono. Se omite.")
+                    logging.debug(f"> Placemark '{feature_name}' no tiene una geometría de Polígono. Se omite.")
         else:
-            print("Advertencia: El archivo KML no contiene un Documento principal.")
+            logging.warning("El archivo KML no contiene un Documento principal.")
         
         # Mensajes de estado final
         if area_servicio is None:
-            print("Advertencia: No se encontró el polígono 'ZONA LÍMITE' en el KML.")
+            logging.warning("No se encontró el polígono 'ZONA LÍMITE' en el KML.")
         if not zonas_recoleccion:
-            print("Advertencia: No se encontraron zonas de recolección en el KML.")
+            logging.warning("No se encontraron zonas de recolección en el KML.")
         
-        print("\nDEBUG: Procesamiento de KML finalizado.")
+        logging.debug("Procesamiento de KML finalizado.")
 
     except FileNotFoundError:
-        print(f"Error: El archivo KML no se encontró en la ruta: {ruta_archivo_kml}. Asegúrate de que 'ZONA_LIMITE.kml' esté en la carpeta 'Data'.")
+        logging.error(f"El archivo KML no se encontró en la ruta: {ruta_archivo_kml}. Asegúrate de que 'ZONA_LIMITE.kml' esté en la carpeta 'Data'.")
     except Exception as e:
-        print(f"Error al cargar o parsear el KML: {e}")
+        logging.error(f"Error al cargar o parsear el KML: {e}")
         import traceback
         traceback.print_exc()
 
 def esta_en_area_servicio(latitud, longitud):
     """Verifica si un punto está dentro de la zona de servicio."""
     if area_servicio is None:
-        print("Error: Área de servicio no definida.")
+        logging.error("Área de servicio no definida.")
         return False
     punto = Point(longitud, latitud) 
     return area_servicio.contains(punto)
