@@ -134,7 +134,7 @@ def obtener_posicion_camion(zona,hora_actual):
         if hora_inicio <= hora_actual.time() < hora_fin:
             horario_inicio_turno = datetime.combine(hora_actual.date(), hora_inicio)
         else:
-            return {'estado': 'fuera_de_servicio'}
+            return [{'estado': 'fuera_de_servicio'}]
         
     else:
         #tunos que cruzan la medianoche
@@ -144,7 +144,7 @@ def obtener_posicion_camion(zona,hora_actual):
             else:
                 horario_inicio_turno = datetime.combine(hora_actual.date(), hora_inicio)
         else:
-            return {'estado': 'fuera_de_servicio'}
+            return [{'estado': 'fuera_de_servicio'}]
 
 
     #lista para almacenar los reusltados de cada camion
@@ -193,7 +193,7 @@ def obtener_posicion_camion(zona,hora_actual):
             'latitud': latitud_actual,
             'longitud': longitud_actual,
             'distancia_restante': distancia_restante_km,
-            'tiempo_restante': str(tiempo_restante),
+            'tiempo_restante': tiempo_restante,
             'turno': turno_activo,
             'identificador_ruta': identificador,
             'ruta_line_string': linea_recorrido

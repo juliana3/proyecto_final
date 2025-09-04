@@ -1,8 +1,11 @@
 #Calculo de la distancia entre el camion y el usuario
 import logging
 from datetime import timedelta
+import math
 from geopy.distance import geodesic
 from shapely.geometry import Point, LineString
+
+from BackEnd.simulador import TURNOS
 
 # Configuración del logging
 logging.basicConfig(
@@ -29,6 +32,9 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
     if not posiciones_camiones:
         return {'estado': 'sin_servicio_en_esta_zona', 'mensaje': 'No hay camiones en servicio en esta zona en este momento.'}
     
+    #establezco la velocidad promedio del camion en km/h
+    #velocidad_camion_km_h = 30
+
     # Creamos un punto Shapely para la ubicación del usuario
     punto_usuario = Point(longitud_usuario, latitud_usuario)
 
@@ -60,40 +66,93 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
 
         # Verificamos si el camión ya ha pasado la posición proyectada del usuario.
         # Usamos un pequeño margen de error para evitar problemas de precisión.
-        if distancia_camion_a_inicio >= distancia_usuario_a_inicio:
+        if distancia_camion_a_inicio >= distancia_usuario_a_inicio - 0.001:
             return {
                 'estado': 'ya_paso_por_su_direccion',
                 'mensaje': 'El camión de recolección ya pasó por su dirección.'
             }
         
-        # Si el camión aún no ha pasado, calculamos el tiempo de llegada
-        tiempo_restante_ruta_str = mejor_camion.get('tiempo_restante')
+        #obtengo las coordenadas reales de los puntos ptoyectados, uso interpolate
+        #punto_camion_proyectado = linea_recorrido.interpolate(distancia_camion_a_inicio)
+        #punto_usuario_proyectado = linea_recorrido.interpolate(distancia_usuario_a_inicio)
         
-        # Convertimos la cadena de tiempo a un objeto timedelta
-        try:
-            parts = list(map(int, tiempo_restante_ruta_str.split(':')))
-            tiempo_restante_ruta = timedelta(hours=parts[0], minutes=parts[1], seconds=parts[2])
-        except (ValueError, IndexError):
-            # En caso de que el formato de tiempo sea diferente (ej. '0:15:00.123456')
-            # Lo manejamos convirtiendo a segundos
-            tiempo_restante_ruta_segundos = float(str(mejor_camion.get('tiempo_restante')).split(' ')[-1])
-            tiempo_restante_ruta = timedelta(seconds=tiempo_restante_ruta_segundos)
+        #DISTANCIA RESTNTE EN LA RUTA DESDE EL CAMION HASTA EL USUARIO
+        distancia_total_recorrido = linea_recorrido.length
+        distancia_restante_hasta_usuario = distancia_usuario_a_inicio - distancia_camion_a_inicio
 
-        # Calculamos el porcentaje de la ruta que le falta al camión para llegar al punto del usuario
-        largo_total_ruta = linea_recorrido.length
-        distancia_recorrido_a_usuario = distancia_usuario_a_inicio - distancia_camion_a_inicio
-        
-        # Proporción del tiempo total de la ruta que le falta al camión para llegar al usuario
-        proporcion_pendiente = distancia_recorrido_a_usuario / largo_total_ruta
-        
-        # Calculamos el tiempo estimado de llegada
-        tiempo_estimado_total = tiempo_restante_ruta * proporcion_pendiente
+        #PROPORCION DE DISTANCIA HASTA EL USUARIO RESPECTO AL TOTAL
+        proporcion_distancia_hasta_usuario = distancia_restante_hasta_usuario / (distancia_total_recorrido - distancia_camion_a_inicio)
 
+        #TIEMPO RESTANTE HASTA EL USUARIO SEGUN LA PROPORCION
+        tiempo_restante_camion = mejor_camion["tiempo_restante"]
+
+        #TIEMPO ESTIMADO HASTA EL USUARIO SEGUN LA PROPORCION
+        tiempo_estimado_usuario = tiempo_restante_camion * proporcion_distancia_hasta_usuario
+
+
+        #calculamos la distancia geodesica real entre ambos puntos proyectados
+        #distancia_recorrido_hasta_usuario_km = geodesic((punto_camion_proyectado.y, punto_camion_proyectado.x), (punto_usuario_proyectado.y, punto_usuario_proyectado.x)).km
+
+
+       
+
+        #calculo el tiempo en horas y lo convierto a timedelta
+        #tiempo_estimado_horas = distancia_recorrido_hasta_usuario_km/ velocidad_camion_km_h #Movimiento Rectilineo Uniforme
+        
+        #tiempo_estimado_llegada = timedelta(hours=tiempo_estimado_horas)
+        
+        #aca convierto el tiempo estimado a un formato legible HH:MM:SS
+        segundos_totales = tiempo_estimado_usuario.total_seconds()
+    
+        # Calcular horas y minutos
+        minutos = math.floor((segundos_totales % 3600) / 60)
+        horas = math.floor(segundos_totales / 3600)
+        
+        # Construir el mensaje de forma condicional
+        mensaje_tiempo = ""
+        if segundos_totales < 60:
+            mensaje_tiempo = "El camión está a menos de 1 minuto de tu ubicación."
+        elif segundos_totales < 3600: # Menos de una hora
+            if minutos == 1:
+                mensaje_tiempo = "Tu camión pasará en aproximadamente 1 minuto."
+            else:
+                mensaje_tiempo = f"Tu camión pasará en aproximadamente {minutos} minutos."
+        else: # Más de una hora
+            
+            if horas == 1:
+                mensaje_tiempo = f"Tu camión pasará en aproximadamente 1 hora y {minutos} minutos."
+            else:
+                mensaje_tiempo = f"Tu camión pasará en aproximadamente {horas} horas y {minutos} minutos."
+            
         return {
             'camion_id': mejor_camion['camion_id'],
-            'distancia_a_camion_km': mejor_camion['distancia_restante'],
-            'tiempo_estimado_llegada': str(tiempo_estimado_total),
+            'distancia_a_camion_km': round(geodesic((mejor_camion["latitud"], mejor_camion["longitud"]), (latitud_usuario, longitud_usuario)).km, 2),
+            'tiempo_estimado_llegada': mensaje_tiempo,
             'identificador_ruta': mejor_camion['identificador_ruta']
+        }
+    elif mejor_camion and mejor_camion.get('estado') == 'finalizado':
+        # Obtenemos la zona a partir del identificador de ruta (ej. RECORRIDO-A1-NS)
+        zona = mejor_camion['identificador_ruta'][0] + "1" if mejor_camion['identificador_ruta'][0] == 'A' else mejor_camion['identificador_ruta']
+        info_turno = TURNOS.get(zona, {})
+        inicio = info_turno.get('inicio')
+        fin = info_turno.get('fin')
+        mensaje_horario = f"El turno de recolección de este camión ya finalizó. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+
+        return {'estado': 'turno_terminado', 'mensaje': mensaje_horario}
+    
+    elif mejor_camion and mejor_camion.get('estado') == "fuera_de_servicio":
+        zona = mejor_camion['identificador_ruta'][0] + "1" if mejor_camion['identificador_ruta'][0] == 'A' else mejor_camion['identificador_ruta']
+        info_turno = TURNOS.get(zona, {})
+        inicio = info_turno.get('inicio')
+        fin = info_turno.get('fin')
+        mensaje_horario = f"El camión no está en servicio en este momento. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+
+        return {'estado': 'fuera_de_servicio', 'mensaje': mensaje_horario}
+    
+    elif mejor_camion and mejor_camion.get('estado') == "error_configuracion":
+        return {
+            'estado': 'error_configuracion',
+            'mensaje': 'Error en la configuración del simulador.'
         }
     else:
         # Si no se encuentra un camión en ruta en la ruta más cercana
@@ -117,7 +176,7 @@ if __name__ == '__main__':
     
     posiciones_simuladas = [
         # El camión NS se encuentra a 31.62, 60.71
-        {'estado': 'en_ruta', 'camion_id': 'camion_NS', 'latitud': -31.62, 'longitud': -60.71, 'distancia_restante': 5.0, 'tiempo_restante': '0:15:00', 'turno': 'matutino', 'identificador_ruta': 'NS', 'ruta_line_string': ruta_ejemplo_ns},
+        {'estado': 'en_ruta', 'camion_id': 'camion_NS', 'latitud': -31.635, 'longitud': -60.71, 'distancia_restante': 5.0, 'tiempo_restante': '0:15:00', 'turno': 'matutino', 'identificador_ruta': 'NS', 'ruta_line_string': ruta_ejemplo_ns},
         {'estado': 'en_ruta', 'camion_id': 'camion_EO', 'latitud': -31.65, 'longitud': -60.68, 'distancia_restante': 8.0, 'tiempo_restante': '0:25:00', 'turno': 'matutino', 'identificador_ruta': 'EO', 'ruta_line_string': ruta_ejemplo_eo}
     ]
 
