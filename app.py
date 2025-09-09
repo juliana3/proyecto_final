@@ -7,8 +7,8 @@ import logging
 
 from BackEnd.zonas import cargar_kml_zonas, esta_en_area_servicio, es_de_santa_fe, cargar_poligono_santa_fe, obtener_zona_recoleccion
 from BackEnd.geocodificacion import geocodificar_direccion
-from BackEnd import simulador
-from BackEnd import distancia
+from BackEnd.simulador import Simulador, TURNOS
+from BackEnd.distancia import calcular_tiempo_a_destino
 
 # Configuración del logging
 logging.basicConfig(
@@ -36,7 +36,7 @@ logging.info("Carga de KML finalizada.")
 
 # Inicializamos el simulador al inicio del script, en lugar de usar un decorador
 logging.info("Inicializando simulador...")
-simulador.inicializar_simulacion(DATA_DIR)
+simulador_camiones = Simulador(DATA_DIR)
 logging.info("Simulador listo. La aplicación puede empezar a recibir peticiones.")
 
 
@@ -44,6 +44,7 @@ logging.info("Simulador listo. La aplicación puede empezar a recibir peticiones
 @app.route('/') #aca va lo primero qe ve el usuario + boton de login
 def index():
     return render_template('index.html')
+
 
 
 @app.route('/verificar_ubicacion', methods=['POST'])
@@ -66,6 +67,7 @@ def verificar_ubicacion():
         return jsonify({'error':'Coordenadas no proporcionadas'}), 400
 
 
+
 @app.route('/consultar_direccion', methods=['POST'])
 def consultar_direccion():
     """
@@ -82,7 +84,7 @@ def consultar_direccion():
     coordenadas = geocodificar_direccion(direccion)
 
     if not coordenadas:
-        return jsonify({'mensaje': 'No se pudo encontrar la dirección. Intenta ser más específico.'}), 404
+        return jsonify({'mensaje': 'No se pudo encontrar la dirección. Por favor verificá la direccion que colocaste.'}), 404
 
     latitud_usuario, longitud_usuario = coordenadas
 
@@ -91,7 +93,7 @@ def consultar_direccion():
     en_area_servicio = esta_en_area_servicio(latitud_usuario, longitud_usuario)
 
     if not en_santa_fe:
-        return jsonify({'mensaje': 'Tu dirección no se encuentra en la ciudad de Santa Fe.'})
+        return jsonify({'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe.'})
     
     if not en_area_servicio:
         return jsonify({'mensaje': 'Estás en Santa Fe, pero fuera del área de servicio de recolección.'})
@@ -102,29 +104,14 @@ def consultar_direccion():
         return jsonify({'mensaje': 'Tu dirección está en el área de servicio, pero no se pudo asignar a una zona específica.'})
 
     hora_actual = datetime.now()
-    posiciones_camiones = simulador.obtener_posicion_camion(zona, hora_actual)
+    posiciones_camiones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
+    logging.info(f"Posiciones de camiones para la zona {zona} a las {hora_actual}: {posiciones_camiones}")
 
-    if not posiciones_camiones or ('estado' in posiciones_camiones[0] and posiciones_camiones[0]['estado'] != 'en_ruta'):
-        # Si la lista está vacía o el camión no está en ruta, devolvemos el mensaje del simulador
-        if posiciones_camiones:
-            camion = posiciones_camiones[0].copy()
-            estado = camion["estado"]
+    resultado_distancia = calcular_tiempo_a_destino(latitud_usuario, longitud_usuario,posiciones_camiones)
 
-            if estado == 'fuera_de_servicio':
-                camion['mensaje'] = f"El camión de esta zona aún no comenzó su turno o ya terminó. Horario del turno: {simulador.TURNOS[zona]['inicio'].strftime('%H:%M')} - {simulador.TURNOS[zona]['fin'].strftime('%H:%M')}"
-            elif estado == 'finalizado':
-                camion['mensaje'] = f"El camión ya finalizó su recorrido para el turno actual. Horario: {simulador.TURNOS[zona]['inicio'].strftime('%H:%M')} - {simulador.TURNOS[zona]['fin'].strftime('%H:%M')}"
-            elif estado == 'error_configuracion':
-                camion['mensaje'] = "Hubo un error en la configuración del simulador para este camión."
-            else:
-                camion['mensaje'] = "No hay camiones en servicio en esta zona en este momento."
-            return jsonify(camion)
-        else:
-            return jsonify({'estado': 'sin_servicio_en_esta_zona', 'mensaje': 'No hay camiones en servicio en esta zona en este momento.'})
-    
-     # Si el camión está en ruta, procedemos con el cálculo
-    resultado_distancia = distancia.calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_camiones)
     return jsonify(resultado_distancia)
+
+    
 
 # Endpoint para obtener la posición de los camiones de una zona específica
 @app.route('/api/camiones/posicion/<string:zona>', methods=['GET'])
@@ -139,25 +126,21 @@ def get_posicion_camiones(zona):
         json: Un objeto JSON con la posición de los camiones o un mensaje de error.
     """
     hora_actual = datetime.now()
-    posiciones = simulador.obtener_posicion_camion(zona, hora_actual)
-    
-    if posiciones and 'estado' in posiciones[0] and posiciones[0]['estado'] == 'error_configuracion':
-        return jsonify({'error': 'Error en la configuración del simulador'}), 500
-    
-    # En este caso, solo devolvemos los datos esenciales para la visualización en el mapa,
-    # ya que no se necesita la geometría de la ruta completa en este endpoint.
+    posiciones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
+
     posiciones_simples = [
         {
             'estado': p['estado'],
             'camion_id': p['camion_id'],
             'latitud': p['latitud'],
             'longitud': p['longitud'],
-            'turno': p['turno'],
+            'turno': TURNOS[p['identificador_ruta'].split('-')[1]]['nombre'],
             'identificador_ruta': p['identificador_ruta']
         } for p in posiciones if p.get('estado') == 'en_ruta'
     ]
     
     return jsonify(posiciones_simples)
+
 
 
 # ENDPOINT para obtener el tiempo estimado de llegada
@@ -183,15 +166,10 @@ def get_tiempo_estimado(zona):
     hora_actual = datetime.now()
     
     # Obtenemos la posición de los camiones, incluyendo la geometría de la ruta
-    posiciones_camiones = simulador.obtener_posicion_camion(zona, hora_actual)
-    
-    # Verificamos si la respuesta del simulador es válida
-    if posiciones_camiones and 'estado' in posiciones_camiones[0] and posiciones_camiones[0]['estado'] != 'en_ruta':
-        # El camión de la zona no está en servicio, finalizado, o hay un error.
-        return jsonify(posiciones_camiones[0])
+    posiciones_camiones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
     
     # Llamamos a la función de distancia para calcular el tiempo de llegada
-    resultado_distancia = distancia.calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_camiones)
+    resultado_distancia = calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_camiones)
     
     return jsonify(resultado_distancia)
 

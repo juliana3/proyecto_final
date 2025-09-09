@@ -6,6 +6,7 @@ from geopy.distance import geodesic
 from shapely.geometry import Point, LineString
 
 from BackEnd.simulador import TURNOS
+from BackEnd.helpers import formatear_tiempo_a_mensaje
 
 # Configuración del logging
 logging.basicConfig(
@@ -30,16 +31,12 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
     """
      
     if not posiciones_camiones:
-        return {'estado': 'sin_servicio_en_esta_zona', 'mensaje': 'No hay camiones en servicio en esta zona en este momento.'}
-    
-    #establezco la velocidad promedio del camion en km/h
-    #velocidad_camion_km_h = 30
-
+       return {'estado': 'sin_servicio_en_esta_zona', 'mensaje': 'No hay camiones en servicio en este momento. AAAA'} #ESTO SE ARREGLA AJUSTANDO LOS HORARIOS DE LOS TURNOS!!!!!!!!
+      
     # Creamos un punto Shapely para la ubicación del usuario
     punto_usuario = Point(longitud_usuario, latitud_usuario)
-
-    mejor_camion = None
     distancia_minima_a_ruta = float('inf')
+    mejor_camion = None
 
     # Primero determinamos cuál de las dos rutas de la zona es la más cercana al usuario
     for camion in posiciones_camiones:
@@ -55,8 +52,17 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
             distancia_minima_a_ruta = distancia_a_ruta
             mejor_camion = camion
 
-    # Si encontramos el camión de la ruta más cercana
-    if mejor_camion and mejor_camion.get('estado') == 'en_ruta':
+    if not mejor_camion or not mejor_camion.get("estado"):
+        #Si no se encontró ningún camión o ruta válida.
+        return {'estado': 'no_camion_disponible', 'mensaje': 'No se encontró un camión disponible para esta zona.BBBB'}
+        
+
+
+
+    #SEGUNDO hacemos la logica para el camion de la ruta mas cerca
+    estado = mejor_camion.get('estado')
+
+    if estado == "en_ruta":
         linea_recorrido = mejor_camion.get('ruta_line_string')
 
         # Proyectamos la ubicación del camión y del usuario en la ruta.
@@ -72,10 +78,7 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
                 'mensaje': 'El camión de recolección ya pasó por su dirección.'
             }
         
-        #obtengo las coordenadas reales de los puntos ptoyectados, uso interpolate
-        #punto_camion_proyectado = linea_recorrido.interpolate(distancia_camion_a_inicio)
-        #punto_usuario_proyectado = linea_recorrido.interpolate(distancia_usuario_a_inicio)
-        
+
         #DISTANCIA RESTNTE EN LA RUTA DESDE EL CAMION HASTA EL USUARIO
         distancia_total_recorrido = linea_recorrido.length
         distancia_restante_hasta_usuario = distancia_usuario_a_inicio - distancia_camion_a_inicio
@@ -88,78 +91,36 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
 
         #TIEMPO ESTIMADO HASTA EL USUARIO SEGUN LA PROPORCION
         tiempo_estimado_usuario = tiempo_restante_camion * proporcion_distancia_hasta_usuario
-
-
-        #calculamos la distancia geodesica real entre ambos puntos proyectados
-        #distancia_recorrido_hasta_usuario_km = geodesic((punto_camion_proyectado.y, punto_camion_proyectado.x), (punto_usuario_proyectado.y, punto_usuario_proyectado.x)).km
-
-
-       
-
-        #calculo el tiempo en horas y lo convierto a timedelta
-        #tiempo_estimado_horas = distancia_recorrido_hasta_usuario_km/ velocidad_camion_km_h #Movimiento Rectilineo Uniforme
         
-        #tiempo_estimado_llegada = timedelta(hours=tiempo_estimado_horas)
-        
-        #aca convierto el tiempo estimado a un formato legible HH:MM:SS
-        segundos_totales = tiempo_estimado_usuario.total_seconds()
-    
-        # Calcular horas y minutos
-        minutos = math.floor((segundos_totales % 3600) / 60)
-        horas = math.floor(segundos_totales / 3600)
-        
-        # Construir el mensaje de forma condicional
-        mensaje_tiempo = ""
-        if segundos_totales < 60:
-            mensaje_tiempo = "El camión está a menos de 1 minuto de tu ubicación."
-        elif segundos_totales < 3600: # Menos de una hora
-            if minutos == 1:
-                mensaje_tiempo = "Tu camión pasará en aproximadamente 1 minuto."
-            else:
-                mensaje_tiempo = f"Tu camión pasará en aproximadamente {minutos} minutos."
-        else: # Más de una hora
-            
-            if horas == 1:
-                mensaje_tiempo = f"Tu camión pasará en aproximadamente 1 hora y {minutos} minutos."
-            else:
-                mensaje_tiempo = f"Tu camión pasará en aproximadamente {horas} horas y {minutos} minutos."
-            
+        mensaje_tiempo = formatear_tiempo_a_mensaje(tiempo_estimado_usuario.total_seconds())
         return {
             'camion_id': mejor_camion['camion_id'],
             'distancia_a_camion_km': round(geodesic((mejor_camion["latitud"], mejor_camion["longitud"]), (latitud_usuario, longitud_usuario)).km, 2),
             'tiempo_estimado_llegada': mensaje_tiempo,
             'identificador_ruta': mejor_camion['identificador_ruta']
         }
-    elif mejor_camion and mejor_camion.get('estado') == 'finalizado':
-        # Obtenemos la zona a partir del identificador de ruta (ej. RECORRIDO-A1-NS)
-        zona = mejor_camion['identificador_ruta'][0] + "1" if mejor_camion['identificador_ruta'][0] == 'A' else mejor_camion['identificador_ruta']
-        info_turno = TURNOS.get(zona, {})
-        inicio = info_turno.get('inicio')
-        fin = info_turno.get('fin')
-        mensaje_horario = f"El turno de recolección de este camión ya finalizó. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+    else: #si el camion no esta en ruta, devuelvo un mensaje segun el estado
+        info_turno = None
 
-        return {'estado': 'turno_terminado', 'mensaje': mensaje_horario}
-    
-    elif mejor_camion and mejor_camion.get('estado') == "fuera_de_servicio":
-        zona = mejor_camion['identificador_ruta'][0] + "1" if mejor_camion['identificador_ruta'][0] == 'A' else mejor_camion['identificador_ruta']
-        info_turno = TURNOS.get(zona, {})
-        inicio = info_turno.get('inicio')
-        fin = info_turno.get('fin')
-        mensaje_horario = f"El camión no está en servicio en este momento. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+        if mejor_camion.get('identificador_ruta'):
+            zona = mejor_camion['identificador_ruta'].split('-')[1]
+            info_turno = TURNOS.get(zona, {})
+            inicio = info_turno.get('inicio')
+            fin = info_turno.get('fin')
 
-        return {'estado': 'fuera_de_servicio', 'mensaje': mensaje_horario}
-    
-    elif mejor_camion and mejor_camion.get('estado') == "error_configuracion":
-        return {
-            'estado': 'error_configuracion',
-            'mensaje': 'Error en la configuración del simulador.'
-        }
-    else:
-        # Si no se encuentra un camión en ruta en la ruta más cercana
-        return {
-            'estado': 'no_camion_en_ruta',
-            'mensaje': 'El camión de la ruta más cercana no está en servicio en este momento.'
-        }
+
+        if estado == 'finalizado' and info_turno and inicio and fin:
+            mensaje = f"El turno de recolección ya finalizó. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+        elif estado == 'fuera_de_servicio' and info_turno and inicio and fin:
+            mensaje = f"El camión no está en servicio en este momento. Horario de servicio: {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+        elif estado == 'error_configuracion':
+            mensaje = "Error en la configuración del simulador. No se encontró la ruta para este camión."
+        else:
+            mensaje = "No hay camiones en servicio en esta zona en este momento."
+
+    return {'estado': estado, 'mensaje': mensaje}
+
+        
 
 
 
