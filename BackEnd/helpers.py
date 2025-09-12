@@ -1,12 +1,5 @@
 #funciones auxiliares
 import math
-import logging
-
-# Configuración del logging
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(message)s"
-)
 
 def formatear_tiempo_a_mensaje(segundos):
     """

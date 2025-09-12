@@ -2,136 +2,183 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log("Script principal cargado.");
 
-    // Obtenemos las referencias a los elementos del DOM una sola vez.
-    const addressForm = document.getElementById('address-form');
-    const addressInput = document.getElementById('address-input');
-    const messageBox = document.getElementById('message-box');
-    const resultBox = document.getElementById('result-box');
+    // Obtenemos las referencias a los elementos del DOM.
+    const botonGeolocalizacion = document.getElementById('botonGeolocalizacion');
+    const botonManual = document.getElementById('botonManual');
+    const direccionForm = document.getElementById('form-direccion');
+    const imputDireccion = document.getElementById('direccion');
+    const mensaje = document.getElementById('mensaje');
+    const resultado = document.getElementById('resultado');
 
-    // 1. Manejamos el flujo de geolocalización al cargar la página.
-    iniciarGeolocalizacion();
+    // Inicialmente, ocultamos los cuadros de resultados
+    mensaje.style.display = 'none';
+    resultado.style.display = 'none';
+    direccionForm.style.display = 'none';
 
-    // 2. Manejamos el evento 'submit' del formulario.
-    if (addressForm) {
-        addressForm.addEventListener('submit', function(event) {
-            event.preventDefault(); // Evita el envío del formulario.
+    // Manejamos el clic en el botón de geolocalización. Si se presiona, se inicia la geolocalización y se oculta el formulario.
+    if (botonGeolocalizacion) {
+        botonGeolocalizacion.addEventListener('click', function() {
+            mensaje.style.display = 'block';
+            resultado.style.display = 'none';
+            iniciarGeolocalizacion();
+            direccionForm.style.display = 'none'; // Ocultamos el formulario
+        });
+    }
 
-            const direccion = addressInput.value;
+    // Manejamos el clic en el botón de entrada manual. Si se presiona, se muestra el formulario y se ocultan los mensajes anteriores.
+    if (botonManual) {
+        botonManual.addEventListener('click', function() {
+            direccionForm.style.display = 'block'; // Mostramos el formulario
+            mensaje.style.display = 'none';
+            resultado.style.display = 'none';
+        });
+    }
+
+    // Manejamos el evento 'submit' del formulario. Cuando se envía, se previene el comportamiento por defecto y se obtiene la dirección ingresada.
+    if (direccionForm) {
+        direccionForm.addEventListener('submit', function(event) {
+            event.preventDefault();
+            const direccion = imputDireccion.value;
             if (direccion) {
-                // Si el usuario ingresa una dirección, la consultamos directamente.
-                consultarDireccionEnBackend(direccion);
+                // Se llama a la función unificada con la dirección
+                consultarUbicacion({ direccion: direccion });
             } else {
-                // COMENTARIO: En lugar de un 'alert', mostramos el mensaje en la interfaz.
-                mostrarMensaje("Por favor, ingresa una dirección válida.", 'bg-red-500');
+                mostrarMensaje("Por favor, ingresa una dirección válida.", 'red');
             }
         });
     }
 
-    /**
-     * Intenta obtener la ubicación del navegador para una primera validación.
-     */
+
+   
+
+    // Funciones principales
+
+    // Función para iniciar la geolocalización del usuario
     function iniciarGeolocalizacion() {
+        mostrarMensaje("Obteniendo tu ubicación...", 'blue');
         if ("geolocation" in navigator) {
             navigator.geolocation.getCurrentPosition(
                 function(posicion) {
                     const latitud = posicion.coords.latitude;
                     const longitud = posicion.coords.longitude;
                     console.log("Ubicación obtenida por GPS:", latitud, longitud);
-                    verificarUbicacionEnBackend(latitud, longitud);
+                    // Se llama a la función unificada con las coordenadas
+                    consultarUbicacion({ latitud: latitud, longitud: longitud });
                 },
                 function(error) {
                     console.error("Error de geolocalización:", error.message);
-                    // COMENTARIO: Mensaje amigable para el usuario sin bloquear la interfaz.
-                    mostrarMensaje("No pudimos obtener tu ubicación, puedes ingresar tu dirección manualmente.", 'bg-yellow-500');
-                    addressForm.style.display = 'block'; // Aseguramos que el formulario esté visible.
+                    mostrarMensaje("No pudimos obtener tu ubicación. Por favor, ingresa tu dirección manualmente.", 'orange');
+                    direccionForm.style.display = 'block';
+                    // Deshabilitamos el botón para evitar que el usuario vuelva a intentarlo sin éxito.
+                    deshabilitarBotonGeolocalizacion();
                 },
                 { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
             );
         } else {
             console.log("Geolocalización no disponible.");
-            mostrarMensaje("Tu navegador no soporta geolocalización. Ingresa tu dirección manualmente.", 'bg-red-500');
-            addressForm.style.display = 'block';
+            mostrarMensaje("Tu navegador no soporta geolocalización. Ingresa tu dirección manualmente.", 'red');
+            direccionForm.style.display = 'block';
+            // Deshabilitamos el botón si la función no es compatible
+            deshabilitarBotonGeolocalizacion();
         }
     }
 
-    /**
-     * Envía las coordenadas al backend para verificar si están en Santa Fe.
-     */
-    function verificarUbicacionEnBackend(lat, lon) {
-        fetch('/verificar_ubicacion', {
+    // Función unificada que envía los datos al backend
+    function consultarUbicacion(datos) {
+        mostrarMensaje("Consultando el servicio... por favor espera.", 'blue');
+        fetch('/consultar_ubicacion', { //es la ruta que esta en app.py
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ latitud: lat, longitud: lon })
+            body: JSON.stringify(datos)
         })
         .then(response => response.json())
         .then(data => {
-            console.log("Respuesta del backend (ubicación):", data);
-            if (data.en_santa_fe) {
-                mostrarMensaje("Ubicación en Santa Fe verificada. Ahora ingresa tu dirección.", 'bg-green-500');
-                addressForm.style.display = 'block';
-            } else {
-                mostrarMensaje("Tu ubicación no se encuentra en Santa Fe. El servicio solo funciona aquí.", 'bg-red-500');
-                addressForm.style.display = 'none';
-            }
+            console.log("Respuesta del backend:", data);
+            mostrarResultadoSegunEstado(data);
         })
         .catch(error => {
-            console.error('Error al verificar ubicación:', error);
-            mostrarMensaje("Ocurrió un error al verificar tu ubicación. Intenta de nuevo más tarde.", 'bg-red-500');
+            console.error('Error al consultar ubicación:', error);
+            mostrarMensaje("Ocurrió un error al procesar tu solicitud. Intenta de nuevo más tarde.", 'red');
         });
     }
 
-    /**
-     * Envía la dirección de texto al backend para consultar el camión.
-     */
-    function consultarDireccionEnBackend(direccion) {
-        // COMENTARIO: Limpiamos los resultados y mensajes anteriores antes de la consulta.
-        mostrarMensaje("Consultando el servicio... por favor espera.", 'bg-blue-500');
-        resultBox.textContent = '';
+    // Función para deshabilitar el botón de geolocalización y cambiar su estilo. Sirve para cuando la geolocalización falla o no es compatible y el usaurio debe ingresar la dirección manualmente. Lo bloquea para que no se siga intentando con la geolocalización.
+    function deshabilitarBotonGeolocalizacion() {
+        if (botonGeolocalizacion) {
+            botonGeolocalizacion.disabled = true;
+            botonGeolocalizacion.style.backgroundColor = '#d1d5db'; // un color gris claro
+            botonGeolocalizacion.style.cursor = 'not-allowed';
+            botonGeolocalizacion.textContent = 'Ubicación deshabilitada';
+        }
+    }
 
-        fetch('/consultar_direccion', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ direccion: direccion })
-        })
-        .then(response => response.json())
-        .then(data => {
-            console.log("Respuesta del backend (dirección):", data);
-            
-            // COMENTARIO: Mapeamos los estados del backend a un mensaje y color.
-            if (data.tiempo_estimado_llegada) {
-                mostrarResultado(data.tiempo_estimado_llegada, 'bg-green-500');
-            } else if (data.mensaje) {
-                // COMENTARIO: Ahora usamos las funciones auxiliares para todos los casos.
-                let estadoColor = 'bg-yellow-500'; // Color por defecto para 'ya_paso'
-                if (data.estado && ['fuera_de_servicio', 'finalizado', 'error_configuracion'].includes(data.estado)) {
-                    estadoColor = 'bg-red-500';
-                }
-                mostrarResultado(data.mensaje, estadoColor);
-            } else {
-                mostrarMensaje("No se pudo obtener el estado del camión. Intenta de nuevo.", 'bg-yellow-500');
+    
+
+    // Funciones auxiliares para mostrar mensajes y resultados.
+    function mostrarMensaje(mensaje_segun_estado, color) {
+        //lo de los colores se elimina cuando este hecho el css. Los colores no representan nada, son para diferenciar los estados. Eran para probar
+        let backgroundColor = 'yellow'; // Por defecto
+        switch(color) {
+            case 'blue': backgroundColor = '#3B82F6'; break;
+            case 'red': backgroundColor = '#EF4444'; break;
+            case 'orange': backgroundColor = '#F59E0B'; break;
+        }
+
+        mensaje.textContent = mensaje_segun_estado;
+        mensaje.style.display = 'block';
+        mensaje.style.backgroundColor = backgroundColor;
+        mensaje.style.color = 'white';
+        mensaje.style.fontWeight = 'bold';
+        mensaje.style.padding = '1rem';
+        mensaje.style.borderRadius = '0.5rem';
+        mensaje.style.textAlign = 'center';
+        mensaje.style.position = 'fixed';
+        mensaje.style.top = '50%';
+        mensaje.style.left = '50%';
+        mensaje.style.transform = 'translate(-50%, -50%)';
+        mensaje.style.zIndex = '1000'; // Asegura que esté por encima de otros elementos
+
+        resultado.style.display = 'none';
+    }
+
+    function mostrarResultado(mensaje_segun_estado, color) {
+        let backgroundColor = 'green'; // Por defecto
+        switch(color) {
+            case 'green': backgroundColor = '#22C55E'; break;
+            case 'red': backgroundColor = '#EF4444'; break;
+            case 'yellow': backgroundColor = '#F59E0B'; break;
+        }
+
+        resultado.textContent = mensaje_segun_estado;
+        resultado.style.display = 'block';
+        resultado.style.backgroundColor = backgroundColor;
+        resultado.style.color = 'white';
+        resultado.style.fontWeight = 'bold';
+        resultado.style.padding = '1rem';
+        resultado.style.borderRadius = '0.5rem';
+        resultado.style.textAlign = 'center';
+        
+        // Agregando las siguientes líneas para centrar
+        resultado.style.position = 'fixed';
+        resultado.style.top = '50%';
+        resultado.style.left = '50%';
+        resultado.style.transform = 'translate(-50%, -50%)';
+        resultado.style.zIndex = '1000'; // Asegura que esté por encima de otros elementos
+        
+        mensaje.style.display = 'none';
+    }
+
+    function mostrarResultadoSegunEstado(data) {
+        if (data.tiempo_estimado_llegada) {
+            mostrarResultado(data.tiempo_estimado_llegada, 'green');
+        } else if (data.mensaje) {
+            let estadoColor = 'yellow';
+            if (data.estado && ['fuera_de_servicio', 'finalizado', 'error_configuracion', 'no_iniciado', 'ya_paso_por_su_direccion'].includes(data.estado)) {
+                estadoColor = 'red';
             }
-        })
-        .catch(error => {
-            console.error('Error al consultar la dirección:', error);
-            mostrarMensaje("Ocurrió un error al procesar tu solicitud.", 'bg-red-500');
-        });
-    }
-
-    /**
-     * Muestra un mensaje en el cuadro de mensajes.
-     */
-    function mostrarMensaje(mensaje, cssClass) {
-        messageBox.textContent = mensaje;
-        messageBox.className = `mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 ${cssClass}`;
-        resultBox.textContent = ''; // Aseguramos que el otro cuadro esté vacío.
-    }
-
-    /**
-     * Muestra el resultado de la consulta.
-     */
-    function mostrarResultado(mensaje, cssClass) {
-        resultBox.textContent = mensaje;
-        resultBox.className = `mt-6 p-4 rounded-lg text-center font-semibold text-white transition-opacity duration-500 ${cssClass}`;
-        messageBox.textContent = '';
+            mostrarResultado(data.mensaje, estadoColor);
+        } else {
+            mostrarMensaje("No se pudo obtener el estado del camión. Intenta de nuevo.", 'red');
+        }
     }
 });

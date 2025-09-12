@@ -158,7 +158,7 @@ def es_de_santa_fe(latitud, longitud):
     """
     global santa_fe_limites
     if santa_fe_limites is None:
-        print("ERROR: El polígono de Santa Fe no ha sido cargado. No se puede verificar la ubicación.")
+        logging.error("El polígono de Santa Fe no ha sido cargado. No se puede verificar la ubicación.")
         return False
 
     punto = Point(longitud, latitud)
@@ -166,71 +166,3 @@ def es_de_santa_fe(latitud, longitud):
 
 
 
-if __name__ == "__main__":
-    # ... (El código de prueba principal que ya tenías)
-    ruta_directorio_actual = os.path.dirname(os.path.abspath(__file__))
-    ruta_base_proyecto = os.path.dirname(ruta_directorio_actual)
-    ruta_kml_zonas = os.path.join(ruta_base_proyecto, 'Data', 'ZONA_LIMITE.kml')
-    ruta_kml_limites = os.path.join(ruta_base_proyecto, 'Data', 'poligono-santa-fe.kml')
-
-    print(f"Intentando cargar límites desde: {ruta_kml_limites}")
-    cargar_poligono_santa_fe(ruta_kml_limites)
-    print(f"Intentando cargar KML desde: {ruta_kml_zonas}")
-    cargar_kml_zonas(ruta_kml_zonas)
-    
-    # --- PRUEBA CON UNA DIRECCIÓN DE TEXTO USANDO LA FUNCIÓN IMPORTADA ---
-    direccion_prueba = "Avenida General Paz 5450"
-    print(f"\nIntentando geocodificar la dirección: '{direccion_prueba}'")
-    coords_prueba = geocodificar_direccion(direccion_prueba)
-
-    if coords_prueba:
-        lat_prueba, lon_prueba = coords_prueba
-        print(f"Coordenadas obtenidas: Latitud={lat_prueba}, Longitud={lon_prueba}")
-
-        print(f"\nProbando punto (Lat: {lat_prueba}, Lon: {lon_prueba}):")
-        if es_de_santa_fe(lat_prueba, lon_prueba):
-            print("El punto está dentro de los límites de la ciudad de Santa Fe.")
-            if esta_en_area_servicio(lat_prueba, lon_prueba):
-                print("Está dentro del área de servicio.")
-                zona = obtener_zona_recoleccion(lat_prueba, lon_prueba)
-                if zona:
-                    print(f"Pertenece a la zona: {zona}")
-                else:
-                    print("No pertenece a una zona de recolección específica dentro del área de servicio.")
-            else:
-                print("Está en Santa Fe, pero NO está dentro del área de servicio específica.")
-        else:
-            print("El punto NO está dentro de los límites de la ciudad de Santa Fe.")
-
-    else:
-        print("No se pudo geocodificar la dirección. Fin del programa.")
-    
-    # --- PRUEBAS CON COORDENADAS FIJAS ORIGINALES ---
-    print("\n--- PRUEBAS CON COORDENADAS FIJAS ORIGINALES ---")
-    lat_dentro_area_servicio = -31.63696
-    lon_dentro_area_servicio = -60.70776
-    lat_en_santa_fe_pero_fuera_servicio = -31.65,
-    lon_en_santa_fe_pero_fuera_servicio = -60.72
-
-    print(f"\nProbando punto (Lat: {lat_dentro_area_servicio}, Lon: {lon_dentro_area_servicio}):")
-    if es_de_santa_fe(lat_dentro_area_servicio, lon_dentro_area_servicio):
-        print("El punto está dentro de los límites de la ciudad de Santa Fe.")
-        if esta_en_area_servicio(lat_dentro_area_servicio, lon_dentro_area_servicio):
-            print("Está dentro del área de servicio.")
-            zona = obtener_zona_recoleccion(lat_dentro_area_servicio, lon_dentro_area_servicio)
-            if zona:
-                print(f"Pertenece a la zona: {zona}")
-        else:
-            print("Está en Santa Fe, pero NO está dentro del área de servicio específica.")
-    else:
-        print("El punto NO está dentro de los límites de la ciudad de Santa Fe.")
-    
-    print(f"\nProbando punto (Lat: {lat_en_santa_fe_pero_fuera_servicio}, Lon: {lon_en_santa_fe_pero_fuera_servicio}):")
-    if es_de_santa_fe(lat_en_santa_fe_pero_fuera_servicio, lon_en_santa_fe_pero_fuera_servicio):
-        print("El punto está dentro de los límites de la ciudad de Santa Fe.")
-        if esta_en_area_servicio(lat_en_santa_fe_pero_fuera_servicio, lon_en_santa_fe_pero_fuera_servicio):
-            print("Está dentro del área de servicio.")
-        else:
-            print("Está en Santa Fe, pero NO está dentro del área de servicio específica.")
-    else:
-        print("El punto NO está dentro de los límites de la ciudad de Santa Fe.")

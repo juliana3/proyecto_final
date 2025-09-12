@@ -41,137 +41,59 @@ logging.info("Simulador listo. La aplicación puede empezar a recibir peticiones
 
 
 # Rutas de la API
-@app.route('/') #aca va lo primero qe ve el usuario + boton de login
+@app.route('/') #aca va lo primero qe ve el usuario 
 def index():
     return render_template('index.html')
 
 
-
-@app.route('/verificar_ubicacion', methods=['POST'])
-def verificar_ubicacion():
-    """endpoint para recibir las coorddenadas GPS desde el front y validar si estan en santa fe"""
-
+#este endpoitn puede recibit una direccion escrita o coordenadas gps
+@app.route('/consultar_ubicacion', methods=['POST'])
+def consultar_ubicacion():
     datos = request.get_json()
-    latitud = datos.get("latitud")
-    longitud = datos.get("longitud")
+    lat_usuario = datos.get("latitud")
+    lon_usuario = datos.get("longitud")
+    direccion_escrita = datos.get("direccion")
+    direccion_coordenadas = None
 
-    if latitud is not None and longitud is not None:
-        #verificamos quee el usuario este en la ciudad de santa fe
-        en_santa_fe = es_de_santa_fe(latitud,longitud)
-
-       
-        return jsonify({
-            'en_santa_fe': en_santa_fe
-        })
+    if direccion_escrita:
+        #si se recibe una direccion escrita se la geocodifica, se la pasa a coordenadas
+        direccion_coordenadas = geocodificar_direccion(direccion_escrita)
+        if not direccion_coordenadas:
+            return jsonify({'mensaje': 'No se pudo encontrar la dirección. Por favor verificá la direccion que colocaste.'}), 404
+        
+        lat_usuario, lon_usuario = direccion_coordenadas
+    elif lat_usuario is not None and lon_usuario is not None:
+        #si se reciben coordenadas gps, se las usa directamente
+        pass
     else:
-        return jsonify({'error':'Coordenadas no proporcionadas'}), 400
-
-
-
-@app.route('/consultar_direccion', methods=['POST'])
-def consultar_direccion():
-    """
-    Recibe una dirección de texto, la geocodifica, verifica si está en un
-    área de servicio y devuelve el estado del camión más cercano.
-    """
-    datos = request.get_json()
-    direccion = datos.get('direccion')
-
-    if not direccion:
-        return jsonify({'error': 'La dirección es requerida'}), 400
-
+        return jsonify({'error': 'Se requiere una dirección o coordenadas GPS'}), 400
     
-    coordenadas = geocodificar_direccion(direccion)
-
-    if not coordenadas:
-        return jsonify({'mensaje': 'No se pudo encontrar la dirección. Por favor verificá la direccion que colocaste.'}), 404
-
-    latitud_usuario, longitud_usuario = coordenadas
-
-    # Paso 2: Verificar si la dirección está dentro de los límites de Santa Fe y del área de servicio
-    en_santa_fe = es_de_santa_fe(latitud_usuario, longitud_usuario)
-    en_area_servicio = esta_en_area_servicio(latitud_usuario, longitud_usuario)
-
+    # --1: VERIFICAR SI ESTA EN SANTA FE
+    en_santa_fe = es_de_santa_fe(lat_usuario, lon_usuario)
     if not en_santa_fe:
-        return jsonify({'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe.'})
+        return jsonify({'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe. Por favor ingresa la direccion manualmente.'})
     
+    # --2: VERIFICAR SI ESTA EN EL AREA DE SERVICIO
+    en_area_servicio = esta_en_area_servicio(lat_usuario, lon_usuario)
     if not en_area_servicio:
         return jsonify({'mensaje': 'Estás en Santa Fe, pero fuera del área de servicio de recolección.'})
 
-    # Paso 3: Si todo está bien, buscar la zona y el camión
-    zona = obtener_zona_recoleccion(latitud_usuario, longitud_usuario)
+    # --3: OBTENER LA ZONA DE RECOLECCION
+    zona = obtener_zona_recoleccion(lat_usuario, lon_usuario)
     if not zona:
         return jsonify({'mensaje': 'Tu dirección está en el área de servicio, pero no se pudo asignar a una zona específica.'})
-
+    
     hora_actual = datetime.now()
     posiciones_camiones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
     logging.info(f"Posiciones de camiones para la zona {zona} a las {hora_actual}: {posiciones_camiones}")
 
-    resultado_distancia = calcular_tiempo_a_destino(latitud_usuario, longitud_usuario,posiciones_camiones)
+    # --4: CALCULAR EL TIEMPO DE LLEGADA DEL CAMION MAS CERCANO
+    logging.info("Calculando tiempo estimado de llegada...")
+    resultado_distancia = calcular_tiempo_a_destino(lat_usuario, lon_usuario,posiciones_camiones)
+    logging.info(f"Resultado del cálculo de distancia a la dirección {lat_usuario}, {lon_usuario}: {resultado_distancia}")
 
     return jsonify(resultado_distancia)
 
-    
-
-# Endpoint para obtener la posición de los camiones de una zona específica
-@app.route('/api/camiones/posicion/<string:zona>', methods=['GET'])
-def get_posicion_camiones(zona):
-    """
-    Endpoint para obtener la posición actual de los camiones de una zona específica.
-    
-    Args:
-        zona: El identificador de la zona (ej. 'A1', 'A2', 'A3').
-        
-    Returns:
-        json: Un objeto JSON con la posición de los camiones o un mensaje de error.
-    """
-    hora_actual = datetime.now()
-    posiciones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
-
-    posiciones_simples = [
-        {
-            'estado': p['estado'],
-            'camion_id': p['camion_id'],
-            'latitud': p['latitud'],
-            'longitud': p['longitud'],
-            'turno': TURNOS[p['identificador_ruta'].split('-')[1]]['nombre'],
-            'identificador_ruta': p['identificador_ruta']
-        } for p in posiciones if p.get('estado') == 'en_ruta'
-    ]
-    
-    return jsonify(posiciones_simples)
-
-
-
-# ENDPOINT para obtener el tiempo estimado de llegada
-@app.route('/api/camiones/tiempo-estimado/<string:zona>', methods=['POST'])
-def get_tiempo_estimado(zona):
-    """
-    Endpoint para calcular el tiempo de llegada del camión más cercano a la ubicación
-    del usuario en una zona específica.
-    
-    Args:
-        zona: El identificador de la zona (ej. 'A1', 'A2', 'A3').
-        
-    Returns:
-        json: Un objeto JSON con el tiempo estimado de llegada o un mensaje de error.
-    """
-    datos = request.get_json()
-    latitud_usuario = datos.get('latitud')
-    longitud_usuario = datos.get('longitud')
-    
-    if latitud_usuario is None or longitud_usuario is None:
-        return jsonify({'error': 'Latitud y longitud son requeridas'}), 400
-        
-    hora_actual = datetime.now()
-    
-    # Obtenemos la posición de los camiones, incluyendo la geometría de la ruta
-    posiciones_camiones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
-    
-    # Llamamos a la función de distancia para calcular el tiempo de llegada
-    resultado_distancia = calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_camiones)
-    
-    return jsonify(resultado_distancia)
 
 
 if __name__ == "__main__":

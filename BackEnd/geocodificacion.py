@@ -1,5 +1,4 @@
 #convierte la direccion proporcionada en texto por el usuario a coordenadas geograficas.
-import requests
 import logging
 from geopy.geocoders import Nominatim
 from geopy.exc import GeocoderTimedOut, GeocoderServiceError
@@ -19,7 +18,7 @@ def geocodificar_direccion(direccion_usuario):
     logging.info(f"Geocodificando la direccion: '{direccion_completa}'")
 
     try:
-        location= geolocator.geocode(direccion_completa, timeout=5)
+        location= geolocator.geocode(direccion_completa, timeout=10)
 
         if location:
             latitud = location.latitude
@@ -33,17 +32,8 @@ def geocodificar_direccion(direccion_usuario):
         logging.error("El servicio de geocodificacion excedió el tiempo de espera")
         return None
     except GeocoderServiceError as e:
-        logging.error(f"Error en el servicio de geocodificacion")
+        logging.error(f"Error en el servicio de geocodificacion: {e}")
         return None
     
 
 
-# Ejemplo de uso (solo se ejecuta si se corre este archivo directamente)
-if __name__ == "__main__":
-    direccion_ejemplo = "Avenida General Paz 5450"
-    coordenadas = geocodificar_direccion(direccion_ejemplo)
-    
-    if coordenadas:
-        print(f"La dirección '{direccion_ejemplo}' se encuentra en Latitud: {coordenadas[0]}, Longitud: {coordenadas[1]}")
-    else:
-        print(f"No se pudo encontrar las coordenadas para la dirección: '{direccion_ejemplo}'")

@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Verificación de Ubicación</title>
-    <script src="{{ url_for('static', filename='main.js') }}"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -13,19 +12,34 @@
 </head>
 <body>
 
-    <!-- Contenedor principal centrado -->
     <div >
-        <h2>
-            Verifica el servicio en tu dirección
-        </h2>
-        <div id="message-box"></div>
-        <form id="address-form">
-            <label for="address-input">Ingresa tu dirección para consultar por el camión:</label>
-            <input type="text" id="address-input" name="address" required >
-            <button type="submit">Verificar Ubicación</button>
-        </form>
-        <div id="result-box" style="margin-top: 1rem; font-weight: bold;"></div>
+        <br><br>
+        <button id="botonGeolocalizacion">
+        Usar mi ubicación actual
+        </button>
+        <button id="botonManual">
+        Ingresar dirección manualmente
+        </button>
 
+        <br><br><br>
+        <form id="form-direccion" class="hidden">
+            <label for="direccion" >Ingresa tu dirección:</label>
+            <div>
+                <input type="text" id="direccion" name="direccion" placeholder="Ej: Obispo Gelabert 2647" >
+            </div>
+            <br>
+            <div>
+                <button type="submit">
+                Consultar
+                </button>
+            </div>
+        </form>
+        
+        <div id="mensaje" class="hidden"></div>
+        <div id="resultado" class="hidden"></div>
     </div>
+
+    <script src= "../static/main.js"></script>
 </body>
+
 </html>
