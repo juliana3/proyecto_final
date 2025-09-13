@@ -14,7 +14,7 @@ def geocodificar_direccion(direccion_usuario):
     Devuelve una tupla con la latitud y longitud o un None"""
 
     geolocator = Nominatim(user_agent="BasureroApp")
-    direccion_completa = f"{direccion_usuario}, Santa Fe, Argentina"
+    direccion_completa = f"{direccion_usuario}, Santa Fe capital, Santa Fe, Argentina"
     logging.info(f"Geocodificando la direccion: '{direccion_completa}'")
 
     try:

@@ -57,33 +57,41 @@ def consultar_ubicacion():
     if datos.get('latitud') is not None and datos.get('longitud') is not None:
         lat_usuario = datos.get('latitud')
         lon_usuario = datos.get('longitud')
+        logging.info("Calculo mediante coordenadas del navegador (UBICACION ACTUAL)")
     elif datos.get('direccion'):
         direccion_escrita = datos.get('direccion')
         direccion_coordenadas = geocodificar_direccion(direccion_escrita)
 
+        logging.info("Calculo mediante direccion escrita.")
         if not direccion_coordenadas:
+            logging.info("No se pudo encontrar la dirección. Por favor verificá la direccion que coloco el usuario.")
             return jsonify({'mensaje': 'No se pudo encontrar la dirección. Por favor verificá la direccion que colocaste.'}), 404
         
         lat_usuario, lon_usuario = direccion_coordenadas
     else: 
+        logging.info("No se recibio ubicación válida. Debe ingresar direccion manualmente")
         return jsonify({
             'mensaje': 'No recibimos ubicación válida. Compartí tu ubicación o ingresá tu dirección manualmente.'}), 400
     
     # --1: VERIFICAR SI ESTA EN SANTA FE
     en_santa_fe = es_de_santa_fe(lat_usuario, lon_usuario)
     if not en_santa_fe:
+        logging.info("EL dispositivo no se encuentra en la ciudad de Santa Fe. Debe ingresar la direccion manualmente.")
         return jsonify({
             'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe. Por favor ingresa la direccion manualmente.'})
     
     # --2: VERIFICAR SI ESTA EN EL AREA DE SERVICIO
     en_area_servicio = esta_en_area_servicio(lat_usuario, lon_usuario)
     if not en_area_servicio:
+        logging.info("EL dispositivo se encuentra en la ciudad de Santa Fe, pero fuera del area de servicio.")
+
         return jsonify({
             'mensaje': 'Estás en Santa Fe, pero fuera del área de servicio de recolección.'})
 
     # --3: OBTENER LA ZONA DE RECOLECCION
     zona = obtener_zona_recoleccion(lat_usuario, lon_usuario)
     if not zona:
+        logging.info("La dirección está en el área de servicio, pero no se pudo asignar a una zona específica.")
         return jsonify({'mensaje': 'Tu dirección está en el área de servicio, pero no se pudo asignar a una zona específica.'})
     
     hora_actual = datetime.now()

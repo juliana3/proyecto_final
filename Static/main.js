@@ -13,6 +13,7 @@ document.addEventListener('DOMContentLoaded', function() {
     resultado.style.display = 'none';
     direccionForm.style.display = 'none';
 
+
     // --- Opción 1: geolocalización ---
     if (botonGeolocalizacion) {
         botonGeolocalizacion.addEventListener('click', function() {
@@ -21,17 +22,17 @@ document.addEventListener('DOMContentLoaded', function() {
             if ("geolocation" in navigator) {
                 navigator.geolocation.getCurrentPosition(
                     function(pos) {
-                        consultarUbicacion({
-                            latitud: pos.coords.latitude,
-                            longitud: pos.coords.longitude
-                        });
+                        const latitud = pos.coords.latitude;
+                        const longitud = pos.coords.longitude;
                         console.log("Ubicación obtenida por GPS:", latitud, longitud);
+
+                        consultarUbicacion({latitud,longitud});
                     },
                     function(err) {
                         console.error("Error geolocalización:", err.message);
                         // Si falla, mostramos el form manual
                         mostrarMensaje("No pudimos obtener tu ubicación. Por favor ingresa la dirección manualmente!", 'red')
-                        direccionForm.style.display = 'block';
+                        direccionForm.style.display = 'block'; //muestra el form
                     },
                     { enableHighAccuracy: true, timeout: 10000, maximumAge: 0 }
                 );
@@ -47,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // --- Opción 2: ingreso manual ---
     if (botonManual) {
         botonManual.addEventListener('click', function() {
-            direccionForm.style.display = 'block';
+            direccionForm.style.display = 'block'; //muestra el form
             mensaje.style.display = 'none';
             resultado.style.display = 'none';
         });
