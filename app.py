@@ -50,33 +50,36 @@ def index():
 @app.route('/consultar_ubicacion', methods=['POST'])
 def consultar_ubicacion():
     datos = request.get_json()
-    lat_usuario = datos.get("latitud")
-    lon_usuario = datos.get("longitud")
-    direccion_escrita = datos.get("direccion")
-    direccion_coordenadas = None
+    lat_usuario = None
+    lon_usuario = None
 
-    if direccion_escrita:
-        #si se recibe una direccion escrita se la geocodifica, se la pasa a coordenadas
+    #si vienen las coordenadas
+    if datos.get('latitud') is not None and datos.get('longitud') is not None:
+        lat_usuario = datos.get('latitud')
+        lon_usuario = datos.get('longitud')
+    elif datos.get('direccion'):
+        direccion_escrita = datos.get('direccion')
         direccion_coordenadas = geocodificar_direccion(direccion_escrita)
+
         if not direccion_coordenadas:
             return jsonify({'mensaje': 'No se pudo encontrar la dirección. Por favor verificá la direccion que colocaste.'}), 404
         
         lat_usuario, lon_usuario = direccion_coordenadas
-    elif lat_usuario is not None and lon_usuario is not None:
-        #si se reciben coordenadas gps, se las usa directamente
-        pass
-    else:
-        return jsonify({'error': 'Se requiere una dirección o coordenadas GPS'}), 400
+    else: 
+        return jsonify({
+            'mensaje': 'No recibimos ubicación válida. Compartí tu ubicación o ingresá tu dirección manualmente.'}), 400
     
     # --1: VERIFICAR SI ESTA EN SANTA FE
     en_santa_fe = es_de_santa_fe(lat_usuario, lon_usuario)
     if not en_santa_fe:
-        return jsonify({'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe. Por favor ingresa la direccion manualmente.'})
+        return jsonify({
+            'mensaje': 'Tu dispositivo no se encuentra en la ciudad de Santa Fe. Por favor ingresa la direccion manualmente.'})
     
     # --2: VERIFICAR SI ESTA EN EL AREA DE SERVICIO
     en_area_servicio = esta_en_area_servicio(lat_usuario, lon_usuario)
     if not en_area_servicio:
-        return jsonify({'mensaje': 'Estás en Santa Fe, pero fuera del área de servicio de recolección.'})
+        return jsonify({
+            'mensaje': 'Estás en Santa Fe, pero fuera del área de servicio de recolección.'})
 
     # --3: OBTENER LA ZONA DE RECOLECCION
     zona = obtener_zona_recoleccion(lat_usuario, lon_usuario)
