@@ -22,7 +22,7 @@ export default function Modal({ isOpen, children, cerrarModal }) {
         }}
       >
         {children}
-
+        
         {/* Botón de cerrar que siempre estará en el modal */}
         <br></br>
         <button
@@ -39,6 +39,7 @@ export default function Modal({ isOpen, children, cerrarModal }) {
         >
           Cerrar / Finalizar
         </button>
+       
       </div>
     </div>
   );

@@ -1,69 +1,78 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* reset.css */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
-
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-/*verde vivido = #0ddf72 botones*/
 body {
+  width: 100%;
+  height: 100%;
+  font-family: sans-serif;
   margin: 0;
   display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
   background-color:  #0c3324 ;
 }
-
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
-}
-
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #155435;
+/* ====== Celulares chicos ====== */
+@media (max-width: 1024px) {
+  .home_conteiner{
+    margin: 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    justify-items: center;
+    font-family:sans-serif;
+  }
+  .titulos{
+    color: #ffbd59;
+    font-size: 50px;
+    font-weight: 900;
+  }
+  p{
+    margin: 3%;
+    color: white;
+    font-size: 25px;
+    font-weight: 700;
+  }
+  .saludo{
+    width:250px;
+    height: auto;
+    margin-left: 13%;
+    margin-bottom: 3%;    
+  }
+  .btns {
+  position: sticky;
+  top: 3%; /* se queda pegado al top cuando llegás a él */
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background-color: #3bcf60;
+  color: black;
+  border: none;
+  border-radius: 15px;
   cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  font-family: sans-serif;
+  font-weight: 900;
+  z-index: 100; /* por si hay otros elementos */
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
+.gifs {
+  width: 50px;
+  height: 75px;  /* corregido */
+}
+  h3{
+    color: white;
   }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+}
+
+/* ====== Celulares grandes // Tablets ====== */
+@media (min-width: 601px) and (max-width: 1024px) {
+
+}
+
+/* ====== Computadoras / Escritorio ====== */
+@media (min-width: 1025px) {
+ 
 }
