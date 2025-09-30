@@ -40,20 +40,20 @@
     margin-bottom: 3%;    
   }
   .btns {
-  position: sticky;
-  top: 3%;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 12px;
-  background-color: #3bcf60;
-  color: black;
-  border: none;
-  border-radius: 15px;
-  cursor: pointer;
-  font-family: sans-serif;
-  font-weight: 900;
-  z-index: 100; 
+   position: sticky;
+    top: 0;              
+    z-index: 999;       
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #3bcf60;
+    color: #0c3324;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: 900;
   }
   .gifs {
     width: 50px;
@@ -100,11 +100,6 @@
   }
   .prev { left: 10px; }
   .next { right: 10px; }
-  .lottie{
-    width: 150;
-    height: 150;
-    margin: "0 auto";
-  }
   .advertencia{
     margin-top: 15%;
     width: 100%;
@@ -159,7 +154,7 @@
   }
   .formulario{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
   }
@@ -169,84 +164,93 @@
     margin-right: 8px;
     border-radius: 12px;
     width: 100%;
+    margin-bottom: 3%;
   }
   .Senalando{
     width: 150px;
   }
-@media (min-width: 1024px) {
-  .home_conteiner {
-    display: grid;
-    grid-template-areas:
-      "titulo titulo"
-      "imagen texto"
-      "imagen boton"
-      "carrusel carrusel"
-      "subTitulo subTitulo"
-      "Senalando texto-dos";
-    grid-template-columns: 1fr 1fr;
-    grid-gap: 2rem;
-    text-align: left;
-    justify-content: center;
-    align-items: center;
-    margin: auto;
+  .loader {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    margin:15px auto;
+    position: relative;
+    color: #FFF;
+    box-sizing: border-box;
+    animation: animloader 2s linear infinite;
   }
-  .titulos {
-    grid-area: titulo;
-    text-align: center;
-    font-size: 2.5rem;
-  }
-  .texto-uno {
-    grid-area: texto;
-    font-size: 25px;
-    text-align: center;
-  }
-  .saludo {
-    grid-area: imagen;
-    max-width: 250px;
-    justify-self: center;
-    margin: auto;
-  }
-  .btns {
-    grid-area: boton;
-    justify-self: center; 
-  }
-  .carousel {
-    grid-area: carrusel;
-  }
-  .subTitulo {
-    grid-area: subTitulo;
-    text-align: center;
-    font-size: 2rem;
-    margin-top: 1rem;
-  }
-  .Senalando {
-    grid-area: Senalando;
-    width: 250px;
-    justify-self: center;
+  @keyframes animloader {
+    0% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
+    25% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 2px;
+    }
+    50% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 2px,  -38px 0 0 -2px;
+    }
+    75% {
+      box-shadow: 14px 0 0 2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
+    100% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
   }
 
-  .texto-dos {
-    grid-area: texto-dos;
-    font-size: 25px;
-    line-height: 1.6;
-    justify-content: center;
-    align-items: center;
-    text-align: center;
-    justify-items: center;
+  @media (min-width: 1024px) {
+    .home_conteiner{
+      margin: 3%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .inicio{
+      text-align: center;
+    }
+    .primero{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    .imgText{
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+      justify-content: center;
+      align-items: center;
+    }
+    .segundo{
+      display: block;
+      align-items: center;
+      justify-items: center;
+    }
+    .tercero{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    .saludo {
+      width: 300px;
+      margin:auto;
+    }
+    .Senalando {
+      width: 200px;
+    }
+    .modal-content {
+      position: relative; 
+      background-color: black;
+      padding: 2rem;
+      border-radius: 12px;
+      width: auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+    }
   }
-
-  .modal-content {
-    position: relative; 
-    background-color: black;
-    padding: 2rem;
-    border-radius: 12px;
-    width: auto;
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    margin: auto;
-  }
-}
 

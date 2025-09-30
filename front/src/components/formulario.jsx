@@ -7,21 +7,23 @@ export default function Formulario() {
   const [resultado, setResultado] = useState(null);
   const [mensaje, setMensaje] = useState(null);
   const [estado, setEstado] = useState("inicio");
+  const [mostrarLoader, setMostrarLoader] = useState(false); // 🔹 loader
   const timeoutRef = useRef(null);
-  //llamada al backend
+
+  // llamada al backend
   const consultarUbicacion = async (datos) => {
     setResultado(null);
     setMensaje("Consultando servicio... por favor esperá.");
     setEstado("cargando");
 
     try {
-      //llamado al enpoint
       const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
       setResultado("No pudimos conectar con el servidor. Intenta más tarde.");
     }
-    //timer de inectavidad y reinicio
+
+    // timer de inactividad y reinicio
     setTimeout(() => {
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => {
@@ -45,9 +47,12 @@ export default function Formulario() {
       consultarUbicacion({ direccion });
     } else {
       setResultado("Por favor, ingresa una dirección válida! ...Redirigiendo...");
+      setMostrarLoader(true); // 🔹 mostrar loader
       setEstado("resultado");
-      timeoutRef.current = setTimeout(() => reiniciarFormulario(), 5000);
-      
+      timeoutRef.current = setTimeout(() => {
+        setMostrarLoader(false); // 🔹 ocultar loader
+        reiniciarFormulario();
+      }, 5000);
     }
   };
 
@@ -60,24 +65,34 @@ export default function Formulario() {
     setResultado(null);
     setMensaje(null);
     setEstado("inicio");
+    setMostrarLoader(false);
   };
 
   return (
     <Vistas
       estado={estado}
       mensaje={mensaje}
-      resultado={resultado}
+      resultado={
+        <>
+          {resultado}
+          {mostrarLoader && <span className="loader"></span>} {/* 🔹 loader condicional */}
+        </>
+      }
       onReiniciar={reiniciarFormulario}
       childrenInicio={
-        <>
-          <div className="formulario">
-            <input className="form" type="text"
-              placeholder="Ingrese calle y numero:"
-              value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}/>
-            <button onClick={enviarDireccion} className="btns"> CONSULTAR</button>
-          </div>
-        </>
+        <div className="formulario">
+          <p>Ingrese calle y numero:</p>
+          <input
+            className="form"
+            type="text"
+            placeholder="Ingrese calle y numero:"
+            value={direccion}
+            onChange={(e) => setDireccion(e.target.value)}
+          />
+          <button onClick={enviarDireccion} className="btns">
+            CONSULTAR
+          </button>
+        </div>
       }
     />
   );

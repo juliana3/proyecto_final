@@ -12,10 +12,11 @@ export default function Vistas({ estado, mensaje, resultado, onReiniciar, childr
       {estado === "cargando" && (
         <div style={{ textAlign: "center" }}>
           <h3>{mensaje}</h3>
-          <DotLottieReact className="lottie"
+          <DotLottieReact
             src="https://lottie.host/9002ff25-648d-4a22-b64b-c7e99d1af878/m0pylI6wwh.lottie"
             loop
             autoplay
+            style={{width: 150, height: 150, margin:"0 auto"}}
           />
         </div>
       )}
