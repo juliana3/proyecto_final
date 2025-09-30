@@ -31,58 +31,66 @@ export default function Home() {
   useEffect(() => {
     const timer = setInterval(() => {
       showSlide(index + 1);
-    }, 5000);
+    }, 5000); 
     return () => clearInterval(timer);
   }, [index]);
 
   // Renderizado del componente Home
   return (
-    <div className="home_conteiner">
-      <h1 className="titulos">BasurApp</h1>
-      <p> ¡Bienvenido! Acá podés consultar fácilmente 
-          cuándo pasa el camión de basura en tu barrio. 
-          Mantener la ciudad limpia nunca fue tan fácil. 
-          ¡Baja y conoce mas! 
-      </p>
-      <img src={gif} alt="Saludo" className="saludo" />
-      {!mostrarUbicacion && !mostrarFormulario && (
-        <button className="btns" onClick={() => setMostrarUbicacion(true)}>
-          CONSULTA ACA TU HORARIO DE RECOLECCION
-          <img src={search} className="gifs" alt="Buscar" />
-        </button>
-      )}
-      <Modal isOpen={mostrarUbicacion} cerrarModal={cerrarModalUbicacion}>
-        <Ubicacion />
-        <button className="btns"
-          onClick={() => {
-            setMostrarUbicacion(false);
-            setMostrarFormulario(true);
-          }}
-        >UTILIZAR OTRA DIRECCION</button>
-      </Modal>
-      <Modal isOpen={mostrarFormulario} cerrarModal={cerrarModalFormulario}>
-        <Formulario />
-      </Modal>
-      <div className="carousel">
-        <div className="carousel-track" style={{ transform: `translateX(${-index * 100}%)` }}>
-          {imagenes.map((src, i) => (
-            <div className="carousel-slide" key={i}>
-              <img src={src} alt={`slide-${i}`} />
-            </div>
-          ))}
-        </div>
-        <button className="carousel-btn prev" onClick={() => showSlide(index - 1)}>&#10094;</button>
-        <button className="carousel-btn next" onClick={() => showSlide(index + 1)}>&#10095;</button>
+  <div className="home_conteiner">
+    <h1 className="titulos">BasurApp</h1>
+    <p className="texto-uno">
+      ¡Bienvenido! Acá podés consultar fácilmente 
+      cuándo pasa el camión de basura en tu barrio. 
+      Mantener la ciudad limpia nunca fue tan fácil. 
+      ¡Baja y conoce más!
+    </p>
+    <img src={gif} alt="Saludo" className="saludo" />
+    {!mostrarUbicacion && !mostrarFormulario && (
+      <button className="btns" onClick={() => setMostrarUbicacion(true)}>
+        CONSULTA ACA TU HORARIO DE RECOLECCION
+        <img src={search} className="gifs" alt="Buscar" />
+      </button>
+    )}
+    <Modal isOpen={mostrarUbicacion} cerrarModal={cerrarModalUbicacion}>
+      <Ubicacion />
+      <button 
+        className="btns"
+        onClick={() => {
+          setMostrarUbicacion(false);
+          setMostrarFormulario(true);
+        }}
+      >
+        UTILIZAR OTRA DIRECCION
+      </button>
+    </Modal>
+    <Modal isOpen={mostrarFormulario} cerrarModal={cerrarModalFormulario}>
+      <Formulario />
+    </Modal>
+    <div className="carousel">
+      <div 
+        className="carousel-track" 
+        style={{ transform: `translateX(${-index * 100}%)` }}
+      >
+        {imagenes.map((src, i) => (
+          <div className="carousel-slide" key={i}>
+            <img src={src} alt={`slide-${i}`} />
+          </div>
+        ))}
       </div>
-      <h1 className="titulos">¿Qué es Basurapp?</h1>
-      <p> En Santa Fe, los horarios de recolección de basura 
-          a veces son difíciles de seguir. <strong>BasurApp </strong>
-          es una aplicacion que te permite consultar en tiempo real 
-          cuando pasara el camion por tu dirección asegurandote asi
-          de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos. <br />
-          ¡Descargá la app y empezá a usarla!
-        </p>
-      <img src={senala} alt="Señalando" width="150px" />
+      <button className="carousel-btn prev" onClick={() => showSlide(index - 1)}>&#10094;</button>
+      <button className="carousel-btn next" onClick={() => showSlide(index + 1)}>&#10095;</button>
     </div>
-  );
+    <h1 className="subTitulo titulos">¿Qué es Basurapp?</h1>
+    <img src={senala} alt="Señalando" className="Senalando" />
+    <p className="texto-dos">
+      En Santa Fe, los horarios de recolección de basura 
+      a veces son difíciles de seguir. <strong>BasurApp </strong>
+      es una aplicación que te permite consultar en tiempo real 
+      cuándo pasará el camión por tu dirección, asegurándote así
+      de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos. <br />
+      ¡Descargá la app y empezá a usarla!
+    </p>
+  </div>
+);
 }

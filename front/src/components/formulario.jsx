@@ -8,19 +8,20 @@ export default function Formulario() {
   const [mensaje, setMensaje] = useState(null);
   const [estado, setEstado] = useState("inicio");
   const timeoutRef = useRef(null);
-
+  //llamada al backend
   const consultarUbicacion = async (datos) => {
     setResultado(null);
     setMensaje("Consultando servicio... por favor esperá.");
     setEstado("cargando");
 
     try {
+      //llamado al enpoint
       const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
       setResultado("No pudimos conectar con el servidor. Intenta más tarde.");
     }
-
+    //timer de inectavidad y reinicio
     setTimeout(() => {
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => {
