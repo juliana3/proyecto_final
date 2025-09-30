@@ -38,39 +38,36 @@ export default function Home() {
   // Renderizado del componente Home
   return(
     <div className="home_conteiner">
-      <div className="inicio">
-        <h1 className="titulos">BasurApp</h1>
-      </div>
       <div className="primero">
         <img src={gif} alt="Saludo" className="saludo" />
         <div className="imgText">
+          <h1 className="titulos">BasurApp</h1>
           <p>
             ¡Bienvenido! Acá podés consultar fácilmente 
             cuándo pasa el camión de basura en tu barrio. 
             Mantener la ciudad limpia nunca fue tan fácil. 
             ¡Baja y conoce más!
           </p>
-            {!mostrarUbicacion && !mostrarFormulario && (
-            <button className="btns" onClick={() => setMostrarUbicacion(true)}>
-              CONSULTA ACA TU HORARIO DE RECOLECCION
-              <img src={search} className="gifs" alt="Buscar" />
-            </button>
-            )}
-            <Modal isOpen={mostrarUbicacion} cerrarModal={cerrarModalUbicacion}>
-              <Ubicacion />
-              <button 
-                className="btns"
-                onClick={() => {
-                setMostrarUbicacion(false);
-                setMostrarFormulario(true);
-              }}
-              >UTILIZAR OTRA DIRECCION</button>
-            </Modal>
-            <Modal isOpen={mostrarFormulario} cerrarModal={cerrarModalFormulario}>
-              <Formulario />
-            </Modal>
         </div>
       </div>
+      {!mostrarUbicacion && !mostrarFormulario && (
+      <button className="btns" onClick={() => setMostrarUbicacion(true)}>
+          CONSULTA ACA TU HORARIO DE RECOLECCION
+            <img src={search} className="gifs" alt="Buscar" />
+      </button>
+        )}
+      <Modal isOpen={mostrarUbicacion} cerrarModal={cerrarModalUbicacion}>
+        <Ubicacion />
+          <button 
+            className="btns"
+            onClick={() => {
+            setMostrarUbicacion(false);
+            setMostrarFormulario(true);
+          }}>UTILIZAR OTRA DIRECCION</button>
+      </Modal>
+      <Modal isOpen={mostrarFormulario} cerrarModal={cerrarModalFormulario}>
+        <Formulario />
+      </Modal>
       <div className="segundo">
         <div className="carousel">
           <div className="carousel-track" style={{ transform: `translateX(${-index * 100}%)` }}>
@@ -83,17 +80,19 @@ export default function Home() {
           <button className="carousel-btn prev" onClick={() => showSlide(index - 1)}>&#10094;</button>
           <button className="carousel-btn next" onClick={() => showSlide(index + 1)}>&#10095;</button>
         </div>
-        <h1 className="titulos">¿Qué es Basurapp?</h1>
       </div>
       <div className="tercero">
-        <p>
-          En Santa Fe, los horarios de recolección de basura 
-          a veces son difíciles de seguir. <strong>BasurApp </strong>
-          es una aplicación que te permite consultar en tiempo real 
-          cuándo pasará el camión por tu dirección, asegurándote así
-          de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos. <br />
-          ¡Descargá la app y empezá a usarla!
-        </p>
+        <div>
+          <h1 className="titulos">¿Qué es Basurapp?</h1>
+          <p>
+            En Santa Fe, los horarios de recolección de basura 
+            a veces son difíciles de seguir. <strong>BasurApp </strong>
+            es una aplicación que te permite consultar en tiempo real 
+            cuándo pasará el camión por tu dirección, asegurándote así
+            de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos. <br />
+            ¡Descargá la app y empezá a usarla!
+          </p>
+        </div>
         <div>
           <img src={senala} alt="Señalando" className="Senalando" />
         </div>
