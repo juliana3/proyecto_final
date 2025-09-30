@@ -25,7 +25,7 @@ export default function Formulario() {
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => {
         reiniciarFormulario();
-      }, 10000);
+      }, 15000);
     }, 5000);
   };
 
@@ -43,9 +43,10 @@ export default function Formulario() {
     if (direccion.trim()) {
       consultarUbicacion({ direccion });
     } else {
-      setResultado("Por favor, ingresa una dirección válida!");
+      setResultado("Por favor, ingresa una dirección válida! ...Redirigiendo...");
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => reiniciarFormulario(), 5000);
+      
     }
   };
 
@@ -68,34 +69,12 @@ export default function Formulario() {
       onReiniciar={reiniciarFormulario}
       childrenInicio={
         <>
-          <h3 style={{ marginTop: 0 }}>Consultar Ubicación</h3>
-          <div>
-            <input
-              type="text"
-              placeholder="Escribí tu dirección"
+          <div className="formulario">
+            <input className="form" type="text"
+              placeholder="Ingrese calle y numero:"
               value={direccion}
-              onChange={(e) => setDireccion(e.target.value)}
-              style={{
-                padding: "8px",
-                width: "calc(100% - 100px)",
-                marginRight: "8px",
-                borderRadius: "6px",
-                border: "1px solid #ccc",
-              }}
-            />
-            <button
-              onClick={enviarDireccion}
-              style={{
-                padding: "8px 12px",
-                backgroundColor: "#3bcf60",
-                color: "#0c3324",
-                border: "none",
-                borderRadius: "6px",
-                cursor: "pointer",
-              }}
-            >
-              Enviar dirección
-            </button>
+              onChange={(e) => setDireccion(e.target.value)}/>
+            <button onClick={enviarDireccion} className="btns"> CONSULTAR</button>
           </div>
         </>
       }

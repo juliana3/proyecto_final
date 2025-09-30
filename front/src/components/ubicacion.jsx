@@ -8,23 +8,25 @@ export default function Ubicacion() {
   const [estado, setEstado] = useState("inicio");
   const timeoutRef = useRef(null);
 
+  //consume el servicio de backend
   const consultarUbicacion = async (datos) => {
     setResultado(null);
     setMensaje("Consultando servicio... por favor esperá.");
     setEstado("cargando");
-
     try {
+      //endpoint al backend
       const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
       setResultado("No pudimos conectar con el servidor. Intenta más tarde.");
     }
 
+    //timer para cerrar por inectividad y cambiar de modal
     setTimeout(() => {
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => {
         reiniciarFormulario();
-      }, 10000);
+      }, 15000);
     }, 5000);
   };
 
@@ -58,6 +60,7 @@ export default function Ubicacion() {
     );
   };
 
+  //funcion para poder volver a hacer otra consulta
   const reiniciarFormulario = () => {
     if (timeoutRef.current) {
       clearTimeout(timeoutRef.current);
@@ -75,19 +78,7 @@ export default function Ubicacion() {
       resultado={resultado}
       onReiniciar={reiniciarFormulario}
       childrenInicio={
-        <button
-          onClick={enviarCoordenadas}
-          style={{
-            padding: "8px 12px",
-            backgroundColor: "#3bcf60",
-            color: "#0c3324",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
-          Usar mi ubicación actual
-        </button>
+        <button className="btns" onClick={enviarCoordenadas}>USAR MI UBICACION ACTUAL</button>
       }
     />
   );

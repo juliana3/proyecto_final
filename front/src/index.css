@@ -1,19 +1,17 @@
-/* reset.css */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
-body {
-  width: 100%;
-  height: 100%;
-  font-family: sans-serif;
-  margin: 0;
-  display: flex;
-  background-color:  #0c3324 ;
-}
-/* ====== Celulares chicos ====== */
-@media (max-width: 1024px) {
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+    margin: 0;
+    display: flex;
+    background-color:  #0c3324 ;
+  }
   .home_conteiner{
     margin: 4%;
     display: flex;
@@ -43,7 +41,7 @@ body {
   }
   .btns {
   position: sticky;
-  top: 3%; /* se queda pegado al top cuando llegás a él */
+  top: 3%;
   display: flex;
   align-items: center;
   gap: 8px;
@@ -55,24 +53,120 @@ body {
   cursor: pointer;
   font-family: sans-serif;
   font-weight: 900;
-  z-index: 100; /* por si hay otros elementos */
-}
-
-.gifs {
-  width: 50px;
-  height: 75px;  /* corregido */
-}
+  z-index: 100; 
+  }
+  .gifs {
+    width: 50px;
+    height: 75px;  /* corregido */
+  }
   h3{
     color: white;
   }
-}
-
-/* ====== Celulares grandes // Tablets ====== */
-@media (min-width: 601px) and (max-width: 1024px) {
-
-}
-
-/* ====== Computadoras / Escritorio ====== */
-@media (min-width: 1025px) {
- 
-}
+  .carousel {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+    margin-top: 3%;
+    overflow: hidden;
+    border-radius: 15px;
+    background-color: white;
+  }
+  .carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+  }
+  .carousel-slide {
+    min-width: 100%;
+    height: 100%;
+  }
+  .carousel-slide img {
+    width: 100%;
+    height: 100%
+  }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 24px;
+    border-radius: 100%;
+  }
+  .prev { left: 10px; }
+  .next { right: 10px; }
+  .lottie{
+    width: 150;
+    height: 150;
+    margin: "0 auto";
+  }
+  .advertencia{
+    margin-top: 15%;
+    width: 100%;
+    height: auto; 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .textAdv{
+    font-size: 15px;
+  }
+  .adv{
+    width: 75px;
+    height: 50px;
+  }
+  .modal {
+    position: fixed;
+    z-index: 999;
+    margin: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    position: relative; 
+    background-color: black;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 95%;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .x {
+    position: absolute;  
+    top: 10px;           
+    right: 15px;          
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .formulario{
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .form{
+    padding: 8px;
+    width: 85%;
+    margin-right: 8px;
+    border-radius: 12px;
+    width: 100%;
+  }
