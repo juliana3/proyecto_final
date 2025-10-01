@@ -1,0 +1,278 @@
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+  body {
+    width: 100%;
+    height: 100%;
+    font-family: sans-serif;
+    margin: 0;
+    display: flex;
+    background-color:  #0c3324 ;
+  }
+  .home_conteiner{
+    margin: 4%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+    justify-items: center;
+    font-family:sans-serif;
+  }
+  .primero{
+    display: flex;
+    flex-direction: column-reverse;
+    align-items: center;
+    justify-content: center;
+  }
+  .titulos{
+    color: #ffbd59;
+    font-size: 50px;
+    font-weight: 900;
+  }
+  p{
+    margin: 3%;
+    color: white;
+    font-size: 25px;
+    font-weight: 700;
+  }
+  .saludo{
+    width:250px;
+    height: auto;
+    margin-left: 13%;
+    margin-bottom: 3%;    
+  }
+  .btns {
+    position: sticky;
+    top: 10px;              
+    z-index: 999;       
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 20px;
+    background-color: #3bcf60;
+    color: #0c3324;
+    border: none;
+    border-radius: 15px;
+    cursor: pointer;
+    font-family: sans-serif;
+    font-weight: 900;
+  }
+  .gifs {
+    width: 50px;
+    height: 75px; 
+  }
+  h3{
+    color: white;
+  }
+  .carousel {
+    position: relative;
+    z-index: 0;
+    width: 100%;
+    max-width: 600px;
+    height: 200px;
+    margin-top: 3%;
+    overflow: hidden;
+    border-radius: 15px;
+    background-color: white;
+  }
+  .carousel-track {
+    display: flex;
+    transition: transform 0.5s ease-in-out;
+    height: 100%;
+  }
+  .carousel-slide {
+    min-width: 100%;
+    height: 100%;
+  }
+  .carousel-slide img {
+    width: 100%;
+    height: 100%
+  }
+  .carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background: rgba(0,0,0,0.5);
+    color: #fff;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 24px;
+    border-radius: 100%;
+  }
+  .prev { left: 10px; }
+  .next { right: 10px; }
+  .advertencia{
+    margin-top: 15%;
+    width: 100%;
+    height: auto; 
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+  }
+  .textAdv{
+    font-size: 15px;
+  }
+  .adv{
+    width: 75px;
+    height: 50px;
+  }
+  .modal {
+    position: fixed;
+    z-index: 999;
+    margin: 0;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .modal-content {
+    position: relative; 
+    background-color: black;
+    padding: 2rem;
+    border-radius: 8px;
+    width: 95%;
+    border-radius: 12px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .x {
+    position: absolute;  
+    top: 10px;           
+    right: 15px;          
+    background: transparent;
+    border: none;
+    color: white;
+    font-size: 1.5rem;
+    cursor: pointer;
+  }
+  .formulario{
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+  .form{
+    padding: 8px;
+    width: 85%;
+    margin-right: 8px;
+    border-radius: 12px;
+    width: 100%;
+    margin-bottom: 3%;
+  }
+  .Senalando{
+    width: 150px;
+  }
+  .loader {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    display: block;
+    margin:15px auto;
+    position: relative;
+    color: #FFF;
+    box-sizing: border-box;
+    animation: animloader 2s linear infinite;
+  }
+  @keyframes animloader {
+    0% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
+    25% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 2px;
+    }
+    50% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 -2px,  -14px 0 0 2px,  -38px 0 0 -2px;
+    }
+    75% {
+      box-shadow: 14px 0 0 2px,  38px 0 0 -2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
+    100% {
+      box-shadow: 14px 0 0 -2px,  38px 0 0 2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
+    }
+  }
+  .loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+  pointer-events: auto;
+}
+.loader-container.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
+  @media (min-width: 1024px) {
+    .home_conteiner{
+      margin: 3%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .inicio{
+      text-align: center;
+    }
+    .primero{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    .imgText{
+      display: flex;
+      flex-direction: column;
+      margin: auto;
+      justify-content: center;
+      align-items: center;
+    }
+    .segundo{
+      display: block;
+      align-items: center;
+      justify-items: center;
+    }
+    .tercero{
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: center;
+    }
+    .saludo {
+      width: 250px;
+      margin:auto;
+    }
+    .Senalando {
+      width: 200px
+    }
+    .modal-content {
+      position: relative; 
+      background-color: black;
+      padding: 2rem;
+      border-radius: 12px;
+      width: auto;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      margin: auto;
+    }
+  }
