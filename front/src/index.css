@@ -62,7 +62,7 @@
   }
   .gifs {
     width: 50px;
-    height: 75px;  /* corregido */
+    height: 75px; 
   }
   h3{
     color: white;
@@ -202,7 +202,25 @@
       box-shadow: 14px 0 0 -2px,  38px 0 0 2px,  -14px 0 0 -2px,  -38px 0 0 -2px;
     }
   }
-
+  .loader-container {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 1);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  opacity: 1;
+  transition: opacity 1s ease-in-out;
+  pointer-events: auto;
+}
+.loader-container.fade-out {
+  opacity: 0;
+  pointer-events: none;
+}
   @media (min-width: 1024px) {
     .home_conteiner{
       margin: 3%;
