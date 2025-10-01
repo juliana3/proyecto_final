@@ -10,6 +10,18 @@ import senala from "../assets/contento_senalando.svg";
 import search from "../assets/Search.gif";
 
 export default function Home() {
+  useEffect(() => {
+    const isInStandaloneMode =
+      window.matchMedia("(display-mode: standalone)").matches ||
+      window.navigator.standalone === true
+    if (!isInStandaloneMode) {
+      const timer = setTimeout(() => {
+        alert("Apreta el icono que se encuentra en la barra de direccion e instala la app en tu dispositivo para una mejor experiencia")
+      }, 6000)
+      return () => clearTimeout(timer)
+    }
+  }, [])
+
   //Funciones abrir modales
   const [mostrarUbicacion, setMostrarUbicacion] = useState(false);
   const [mostrarFormulario, setMostrarFormulario] = useState(false);
@@ -42,10 +54,9 @@ export default function Home() {
         <img src={gif} alt="Saludo" className="saludo" />
         <div className="imgText">
           <h1 className="titulos">BasurApp</h1>
-          <p>
-            ¡Bienvenido! Acá podés consultar fácilmente 
-            cuándo pasa el camión de basura en tu barrio. 
-            Mantener la ciudad limpia nunca fue tan fácil. 
+          <p className="text">
+            ¡Bienvenido!<br></br> Acá podés consultar fácilmente 
+            cuándo pasa el camión de basura en tu barrio.<br></br> 
             ¡Baja y conoce más!
           </p>
         </div>
@@ -84,19 +95,19 @@ export default function Home() {
       <div className="tercero">
         <div>
           <h1 className="titulos">¿Qué es Basurapp?</h1>
-          <p>
+          <p className="text">
             En Santa Fe, los horarios de recolección de basura 
             a veces son difíciles de seguir. <strong>BasurApp </strong>
             es una aplicación que te permite consultar en tiempo real 
             cuándo pasará el camión por tu dirección, asegurándote así
-            de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos. <br />
-            ¡Descargá la app y empezá a usarla!
+            de que tus residuos se recojan a tiempo, sin sorpresas ni retrasos.
           </p>
         </div>
         <div>
           <img src={senala} alt="Señalando" className="Senalando" />
         </div>
       </div>
+      <p className="titulo">Mantener la ciudad limpia nunca fue tan fácil💛</p>
     </div>
   );
 }
