@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-import HomeConLoader from './components/loader'; // este es el loader + home
+import HomeConLoader from './components/loader'; 
 import Ubicacion from './components/ubicacion';
 import Modal from './components/modal';
 import Formulario from './components/formulario';

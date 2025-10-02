@@ -1,26 +1,27 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Vistas from "../components/vistas";
+import saludo from "../assets/contento_btn.svg"
 
 export default function Formulario() {
   const [direccion, setDireccion] = useState("");
   const [resultado, setResultado] = useState(null);
   const [mensaje, setMensaje] = useState(null);
   const [estado, setEstado] = useState("inicio");
-  const [mostrarLoader, setMostrarLoader] = useState(false); // 🔹 loader
+  const [mostrarLoader, setMostrarLoader] = useState(false); 
   const timeoutRef = useRef(null);
 
   // llamada al backend
   const consultarUbicacion = async (datos) => {
     setResultado(null);
-    setMensaje("Consultando servicio... por favor esperá.");
+    setMensaje("🔎 Consultando el servicio... por favor espere.");
     setEstado("cargando");
 
     try {
       const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
-      setResultado("No pudimos conectar con el servidor. Intenta más tarde.");
+      setResultado("🚫 Error de conexión. Intentalo más tarde.");
     }
 
     // timer de inactividad y reinicio
@@ -38,7 +39,7 @@ export default function Formulario() {
     } else if (data.mensaje) {
       setResultado(data.mensaje);
     } else {
-      setResultado("No se pudo obtener información del camión más cercano. Intenta de nuevo.");
+      setResultado("⚠️ No se pudo consultar por el camión más cercano. Intentá otra vez.");
     }
   };
 
@@ -46,11 +47,11 @@ export default function Formulario() {
     if (direccion.trim()) {
       consultarUbicacion({ direccion });
     } else {
-      setResultado("Por favor, ingresa una dirección válida! ...Redirigiendo...");
-      setMostrarLoader(true); // 🔹 mostrar loader
+      setResultado("📍 Dirección no válida. Vas a ser redirigido otra vez.");
+      setMostrarLoader(true);
       setEstado("resultado");
       timeoutRef.current = setTimeout(() => {
-        setMostrarLoader(false); // 🔹 ocultar loader
+        setMostrarLoader(false);
         reiniciarFormulario();
       }, 5000);
     }
@@ -75,13 +76,13 @@ export default function Formulario() {
       resultado={
         <>
           {resultado}
-          {mostrarLoader && <span className="loader"></span>} {/* 🔹 loader condicional */}
+          {mostrarLoader && <span className="loader"></span>}
         </>
       }
       onReiniciar={reiniciarFormulario}
       childrenInicio={
         <div className="formulario">
-          <p>Ingrese calle y numero:</p>
+          <p>✏️ Ingresá tu dirección (calle y número):</p>
           <input
             className="form"
             type="text"
@@ -90,6 +91,7 @@ export default function Formulario() {
             onChange={(e) => setDireccion(e.target.value)}
           />
           <button onClick={enviarDireccion} className="btns">
+            <img src={saludo} className="gifs" alt="Buscar" />
             CONSULTAR
           </button>
         </div>

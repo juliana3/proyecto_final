@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Vistas from "../components/vistas";
+import saludo from "../assets/contento_btn.svg"
 
 export default function Ubicacion() {
   const [resultado, setResultado] = useState(null);
@@ -11,14 +12,14 @@ export default function Ubicacion() {
   //consume el servicio de backend
   const consultarUbicacion = async (datos) => {
     setResultado(null);
-    setMensaje("Consultando servicio... por favor esperá.");
+    setMensaje("🔎 Consultando el servicio... por favor espere.");
     setEstado("cargando");
     try {
       //endpoint al backend
       const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
-      setResultado("No pudimos conectar con el servidor. Intenta más tarde.");
+      setResultado("🚫 Error de conexión. Intentalo más tarde.");
     }
 
     //timer para cerrar por inectividad y cambiar de modal
@@ -36,12 +37,12 @@ export default function Ubicacion() {
     } else if (data.mensaje) {
       setResultado(data.mensaje);
     } else {
-      setResultado("No se pudo obtener información del camión más cercano. Intenta de nuevo.");
+      setResultado("⚠️ No se pudo consultar por el camión más cercano. Intentá otra vez.");
     }
   };
 
   const enviarCoordenadas = () => {
-    setMensaje("Obteniendo tu ubicación...");
+    setMensaje("🔎 Detectando tu ubicación...");
     setEstado("cargando");
 
     navigator.geolocation.getCurrentPosition(
@@ -52,7 +53,7 @@ export default function Ubicacion() {
         });
       },
       () => {
-        setResultado("No pudimos obtener tu ubicación. Ingresá la dirección manualmente!");
+        setResultado("🚫 Ubicación no disponible. Intentá ingresando otra dirección.");
         setEstado("resultado");
         timeoutRef.current = setTimeout(() => reiniciarFormulario(), 5000);
       },
@@ -78,7 +79,10 @@ export default function Ubicacion() {
       resultado={resultado}
       onReiniciar={reiniciarFormulario}
       childrenInicio={
-        <button className="btns" onClick={enviarCoordenadas}>USAR MI UBICACION ACTUAL</button>
+        <button className="btns" onClick={enviarCoordenadas}>
+          <img src={saludo} className="gifs" alt="Buscar" />
+          USAR MI UBICACION ACTUAL
+          </button>
       }
     />
   );

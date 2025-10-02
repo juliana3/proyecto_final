@@ -32,11 +32,30 @@
     font-size: 50px;
     font-weight: 900;
   }
+  .titulo{
+    color: #ffbd59;
+    font-size: 25px;
+    font-weight: 700;
+    margin-top:10%;
+    margin-bottom: 10%;
+  }
+  strong{
+    font-size: 35px;
+  }
   p{
-    margin: 3%;
     color: white;
     font-size: 25px;
     font-weight: 700;
+  }
+  .text{
+    margin-top:1%;
+    margin-bottom: 5%;
+    margin-left: auto;
+    margin-right: auto;
+    color: white;
+    font-size: 25px;
+    font-weight: 700;
+    width: 75%;
   }
   .saludo{
     width:250px;
@@ -52,9 +71,9 @@
     align-items: center;
     gap: 8px;
     padding: 10px 20px;
-    background-color: #3bcf60;
-    color: #0c3324;
-    border: none;
+    background-color: #97c8a0;
+    color: black;
+    border:black 2px solid;
     border-radius: 15px;
     cursor: pointer;
     font-family: sans-serif;
@@ -73,7 +92,8 @@
     width: 100%;
     max-width: 600px;
     height: 200px;
-    margin-top: 3%;
+    margin-top: 15%;
+    margin-bottom: 5%;
     overflow: hidden;
     border-radius: 15px;
     background-color: white;
@@ -129,17 +149,17 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
+    background-color: rgba(0, 0, 0, 0.6);
     display: flex;
     align-items: center;
     justify-content: center;
   }
   .modal-content {
     position: relative; 
-    background-color: black;
+    background-color:  rgba(0, 0, 0, 1);
     padding: 2rem;
     border-radius: 8px;
-    width: 95%;
+    width: auto;
     border-radius: 12px;
     text-align: center;
     display: flex;
@@ -221,58 +241,27 @@
   opacity: 0;
   pointer-events: none;
 }
-  @media (min-width: 1024px) {
-    .home_conteiner{
-      margin: 3%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+
+.resultados p{
+  text-align: center;
+  width: 200px;
+  margin: auto;
+}
+@media (min-width: 1000px) {
+    .text{
+      font-size: 35px;
     }
-    .inicio{
-      text-align: center;
+    .saludo{
+      margin-right: 10%;
+      width: 350px;
     }
-    .primero{
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    .imgText{
-      display: flex;
-      flex-direction: column;
-      margin: auto;
-      justify-content: center;
-      align-items: center;
-    }
-    .segundo{
-      display: block;
-      align-items: center;
-      justify-items: center;
-    }
-    .tercero{
-      display: flex;
-      flex-direction: row;
-      align-items: center;
-      justify-content: center;
-    }
-    .saludo {
+    .Senalando{
       width: 250px;
-      margin:auto;
     }
-    .Senalando {
-      width: 200px
-    }
-    .modal-content {
-      position: relative; 
-      background-color: black;
-      padding: 2rem;
-      border-radius: 12px;
-      width: auto;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      margin: auto;
-    }
+    .titulo{
+    color: #ffbd59;
+    font-size: 35px;
+    font-weight: 700;
+    margin-top: 3%;
+  }
   }

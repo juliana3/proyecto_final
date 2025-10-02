@@ -1,6 +1,7 @@
 import { DotLottieReact } from "@lottiefiles/dotlottie-react";
 import advertencia from "../assets/advertencia.png";
 
+
 export default function Vistas({ estado, mensaje, resultado, onReiniciar, childrenInicio }) {
   return (
     <div style={{ padding: "1rem" }}>
@@ -21,7 +22,7 @@ export default function Vistas({ estado, mensaje, resultado, onReiniciar, childr
         </div>
       )}
       {estado === "resultado" && (
-        <div style={{ textAlign: "center" }}>
+        <div  className="resultados">
           <p>{resultado}</p>
           <div className="advertencia">
             <img src={advertencia} alt="" className="adv" />
