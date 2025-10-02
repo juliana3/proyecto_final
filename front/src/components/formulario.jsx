@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Vistas from "../components/vistas";
-import saludo from "../assets/contento_btn.svg"
+
 
 export default function Formulario() {
   const [direccion, setDireccion] = useState("");
@@ -91,7 +91,7 @@ export default function Formulario() {
             onChange={(e) => setDireccion(e.target.value)}
           />
           <button onClick={enviarDireccion} className="btns">
-            <img src={saludo} className="gifs" alt="Buscar" />
+            
             CONSULTAR
           </button>
         </div>

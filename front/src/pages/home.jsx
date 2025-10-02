@@ -74,7 +74,6 @@ export default function Home() {
             setMostrarUbicacion(false);
             setMostrarFormulario(true);
           }}>
-            <img src={saludo} className="gifs" alt="Buscar" />
             UTILIZAR OTRA DIRECCION
             </button>
       </Modal>

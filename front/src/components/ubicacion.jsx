@@ -1,7 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
 import Vistas from "../components/vistas";
-import saludo from "../assets/contento_btn.svg"
 
 export default function Ubicacion() {
   const [resultado, setResultado] = useState(null);
@@ -80,7 +79,6 @@ export default function Ubicacion() {
       onReiniciar={reiniciarFormulario}
       childrenInicio={
         <button className="btns" onClick={enviarCoordenadas}>
-          <img src={saludo} className="gifs" alt="Buscar" />
           USAR MI UBICACION ACTUAL
           </button>
       }
