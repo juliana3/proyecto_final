@@ -81,20 +81,25 @@ export default function Formulario() {
       }
       onReiniciar={reiniciarFormulario}
       childrenInicio={
-        <div className="formulario">
-          <p>✏️ Ingresá tu dirección (calle y número):</p>
-          <input
-            className="form"
-            type="text"
-            placeholder="Ingrese calle y numero:"
-            value={direccion}
-            onChange={(e) => setDireccion(e.target.value)}
-          />
-          <button onClick={enviarDireccion} className="btns">
-            
-            CONSULTAR
-          </button>
-        </div>
+        <form
+    className="formulario"
+    onSubmit={(e) => {
+      e.preventDefault(); 
+      enviarDireccion();
+    }}
+    >
+    <p>✏️ Ingresá tu dirección (calle y número):</p>
+    <input
+      className="form"
+      type="text"
+      placeholder="Ingrese calle y numero:"
+      value={direccion}
+      onChange={(e) => setDireccion(e.target.value)}
+    />
+    <button type="submit" className="btns">
+      CONSULTAR
+    </button>
+  </form>
       }
     />
   );

@@ -130,17 +130,23 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
         }
     else: #si el camion no esta en ruta, devuelvo un mensaje segun el estado
         if estado == 'finalizado' and info_turno and inicio and fin:
-            mensaje = f"El turno de recolección ya finalizó!. El proximo servicio de recolección para tu dirección comienza mañana. De {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+            mensaje = f"✨ El turno de hoy ya terminó. Pero mañana volveremos a pasar por tu dirección de {inicio.strftime('%H')}Hs a {fin.strftime('%H')}Hs."
+
         elif estado == 'fuera_de_servicio' and info_turno and inicio and fin:
-            mensaje = f"Los servicios de recolección no están en servicio en este momento!. El horario de servicio es de 8:00 a 00:00."
+            mensaje = f"🚫 ¡Ups! No estamos en servicio ahora. Nuestro horario es de 8:00 a 00:00."
+
         elif estado == 'ya_paso_por_su_direccion' and info_turno and inicio and fin:
-            mensaje = f"El camión de recolección ya pasó! El proximo servicio de recolección para tu dirección comienza mañana. De {inicio.strftime('%H:%M')} a {fin.strftime('%H:%M')}."
+            mensaje = f"👍 Hoy el camión ya pasó. Mañana regresamos entre {inicio.strftime('%H')}Hs y las {fin.strftime('%H')}Hs."
+
         elif estado == 'error_configuracion':
-            mensaje = "Error en la configuración del simulador. No se encontró la ruta para este camión."
+            mensaje = "⚠️ Hubo un error interno. No encontramos la ruta del camión."
+
         elif estado == 'no_iniciado' and info_turno and inicio and fin:
-            mensaje = f"El turno de recolección aún no empezó!. Comenzará a las {inicio.strftime('%H:%M')} y hasta las {fin.strftime('%H:%M')}."
+            mensaje = f"⌛ ¡Todavía no comenzamos! Pasaremos a tu dirección entre {inicio.strftime('%H:%M')} y {fin.strftime('%H:%M')}."
+
         else:
-            mensaje = "No hay camiones en servicio en esta zona en este momento."
+            mensaje = "ℹ️ No hay camiones disponibles en tu zona por ahora."
+
 
     return {'estado': estado, 'mensaje': mensaje}
 

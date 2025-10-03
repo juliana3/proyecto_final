@@ -6,7 +6,7 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
-      registerType: 'autoUpdate',
+      registerType: 'autoUpdate', // actualiza automáticamente el SW
       includeAssets: [
         'ICONO.ico',
         'robots.txt',
@@ -20,7 +20,6 @@ export default defineConfig({
         display: 'standalone',
         background_color: '#ffffff',
         theme_color: '#ffffff',
-       
         icons: [
           {
             src: 'web-app-manifest-192x192.png',

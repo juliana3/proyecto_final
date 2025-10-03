@@ -1,6 +1,6 @@
 {
   "name": "BasurApp",
-  "short_name": "B-App",
+  "short_name": "BasurApp",
   "icons": [
     {
       "src": "/web-app-manifest-192x192.png",
