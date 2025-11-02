@@ -20,7 +20,7 @@ logging.basicConfig(
 TURNOS = {
     'A1': {"nombre": "matutino", "inicio": time(8, 0), "fin": time(12, 59)},
     'A2': {"nombre": "nocturno", "inicio": time(19, 0), "fin": time(23, 59)},
-    'A3': {"nombre": "vespertino", "inicio": time(13, 0), "fin": time(17, 59)}
+    'A3': {"nombre": "vespertino", "inicio": time(13, 0), "fin": time(18, 59)}
 }
 
 def calcular_horario_turno(hora_actual, hora_inicio, hora_fin):

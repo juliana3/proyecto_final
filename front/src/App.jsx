@@ -5,6 +5,7 @@ import Ubicacion from './components/ubicacion';
 import Modal from './components/modal';
 import Formulario from './components/formulario';
 import Vistas from './components/vistas';
+import Demo from './components/Demo';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/formulario" element={<Formulario />} />
         <Route path="/vistas" element={<Vistas />} />
         <Route path='homeconloader' element={<HomeConLoader />} />
+        <Route path="/demo" element={<Demo />} />
       </Routes>
     </Router>
   );

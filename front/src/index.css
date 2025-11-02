@@ -248,6 +248,36 @@
   width: 200px;
   margin: auto;
 }
+/* Contenedor de título + botón */
+.btnDemoContainer {
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-start;
+  width: 100%;
+  margin-bottom: 1rem;
+  flex-direction: column;
+}
+
+/* Botón DEMO */
+.btnDemo {
+  padding: 10px 20px;
+  background-color: #97c8a0;
+  color: black;
+  border: 2px solid black;
+  border-radius: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  transition: 0.3s;
+}
+
+.btnDemo:hover {
+  background-color: #85b28c;
+}
+
+
 @media (min-width: 1000px) {
     .text{
       font-size: 35px;
@@ -265,4 +295,15 @@
     font-weight: 700;
     margin-top: 3%;
   }
+   .btnDemoContainer {
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
   }
+
+  .btnDemo {
+    margin-left: 0; /* Se centra automáticamente con flex */
+    width: 80%;     /* Opcional: ocupa casi todo el ancho */
+  }
+}
+

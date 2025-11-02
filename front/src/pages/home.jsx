@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react"; 
+import { Link } from "react-router-dom"
 import Ubicacion from "../components/ubicacion"; 
 import Formulario from "../components/formulario";
 import Modal from "../components/modal"; 
@@ -8,6 +9,7 @@ import sfdos from "../assets/dias.webp";
 import senala from "../assets/contento_senalando.svg";
 import search from "../assets/Search.gif";
 import saludo from "../assets/contento_btn.svg"
+
 export default function Home() {
   useEffect(() => {
   const isInStandaloneMode =
@@ -47,10 +49,17 @@ export default function Home() {
 
   // Renderizado del componente Home
   return(
+    
     <div className="home_conteiner">
+      
       <div className="primero">
         <img src={gif} alt="Saludo" className="saludo" />
         <div className="imgText">
+          <div className="btnDemoContainer">
+            <Link to="/demo">
+              <button className="btnDemo">DEMO</button>
+            </Link>
+          </div>
           <h1 className="titulos">BasurApp</h1>
           <p className="text">
             ¡Hola! 🗑️✨ <br />
