@@ -26,8 +26,7 @@ logging.basicConfig(
 app = Flask(__name__)
 
 # Habilitar CORS (puede ser CORS(app, origins=["http://localhost:5173"]) para limitar)
-CORS(app)
-
+CORS(app, origins=["https://basur-app.vercel.app"])
 app.config['SERVER_NAME'] = None  # Permite cualquier host
 
 # Rutas absolutas del proyecto y datos
