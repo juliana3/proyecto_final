@@ -22,7 +22,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-# Inicializar app Flask
+# Inicializar app Flask aaa
 app = Flask(__name__)
 
 # Habilitar CORS (puede ser CORS(app, origins=["http://localhost:5173"]) para limitar)
