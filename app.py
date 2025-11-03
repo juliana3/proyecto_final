@@ -52,7 +52,11 @@ logging.info("Simulador listo. La aplicación puede empezar a recibir peticiones
 # Ruta principal
 @app.route('/')
 def index():
-    return render_template('index.html')
+    return jsonify({
+        'message': 'API de BASURAPP funcionando correctamente',
+        'version': '1.0',
+        'endpoints': ['/consultar_ubicacion']
+    })
 
 
 # Endpoint principal: recibe dirección escrita o coordenadas GPS
@@ -125,4 +129,5 @@ def consultar_ubicacion():
 
 
 if __name__ == "__main__":
-    app.run(debug=True, port=4000, host='0.0.0.0')
+    port = int(os.environ.get("PORT", 4000))  # Usa el puerto de Render o 4000 local
+    app.run(debug=False, port=port, host='0.0.0.0')  # debug=False en producción
