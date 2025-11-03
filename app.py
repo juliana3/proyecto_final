@@ -14,6 +14,7 @@ from BackEnd.zonas import (
 from BackEnd.geocodificacion import geocodificar_direccion
 from BackEnd.simulador import Simulador, TURNOS
 from BackEnd.distancia import calcular_tiempo_a_destino
+from BackEnd.DEMO import es_direccion_demo, obtener_respuesta_demo
 
 # Configuración del logging
 logging.basicConfig(
@@ -23,10 +24,11 @@ logging.basicConfig(
 
 # Inicializar app Flask
 app = Flask(__name__)
-app.secret_key = 'f1144cc94278494f8b3a61a689a658a2'
 
 # Habilitar CORS (puede ser CORS(app, origins=["http://localhost:5173"]) para limitar)
 CORS(app)
+
+app.config['SERVER_NAME'] = None  # Permite cualquier host
 
 # Rutas absolutas del proyecto y datos
 PROJECT_ROOT = os.path.dirname(os.path.abspath(__file__))
@@ -60,13 +62,24 @@ def consultar_ubicacion():
     lat_usuario = None
     lon_usuario = None
 
+    # Verificar modo DEMO
+    if datos.get('direccion'):
+        direccion_escrita = datos.get('direccion')
+        
+        if es_direccion_demo(direccion_escrita):
+            respuesta_demo = obtener_respuesta_demo(direccion_escrita)
+            return jsonify({
+                'mensaje': respuesta_demo['mensaje']
+            }), respuesta_demo['status_code']
+
+
     # Si vienen coordenadas
     if datos.get('latitud') is not None and datos.get('longitud') is not None:
         lat_usuario = datos.get('latitud')
         lon_usuario = datos.get('longitud')
         logging.info("Cálculo mediante coordenadas del navegador (UBICACIÓN ACTUAL)")
     elif datos.get('direccion'):
-        # Si viene dirección escrita
+        # Si viene dirección escrita 
         direccion_escrita = datos.get('direccion')
         direccion_coordenadas = geocodificar_direccion(direccion_escrita)
 

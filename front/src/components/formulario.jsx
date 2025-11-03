@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import axios from "axios";
+import api from "../api/axios";
 import Vistas from "../components/vistas";
 
 
@@ -18,7 +19,7 @@ export default function Formulario() {
     setEstado("cargando");
 
     try {
-      const res = await axios.post("http://localhost:4000/consultar_ubicacion", datos);
+      const res = await api.post("/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
       setResultado("🚫 Error de conexión. Intentalo más tarde.");

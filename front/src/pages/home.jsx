@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"; 
-import { Link } from "react-router-dom"
 import Ubicacion from "../components/ubicacion"; 
 import Formulario from "../components/formulario";
 import Modal from "../components/modal"; 
@@ -55,11 +54,6 @@ export default function Home() {
       <div className="primero">
         <img src={gif} alt="Saludo" className="saludo" />
         <div className="imgText">
-          <div className="btnDemoContainer">
-            <Link to="/demo">
-              <button className="btnDemo">DEMO</button>
-            </Link>
-          </div>
           <h1 className="titulos">BasurApp</h1>
           <p className="text">
             ¡Hola! 🗑️✨ <br />
