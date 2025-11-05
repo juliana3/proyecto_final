@@ -65,7 +65,7 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
                 'estado': 'no_hay_camion_disponible',
                 'mensaje': 'No se encontró un camión disponible para esta zona.',
                 'distancia_a_camion_km':  round(geodesic((mejor_camion["latitud"], mejor_camion["longitud"]), (latitud_usuario, longitud_usuario)).km, 2) if mejor_camion else None,
-                'tiempo_estimado_llegada': mejor_camion['tiempo_restante'] if mejor_camion else None,
+                'tiempo_estimado_llegada': formatear_tiempo_a_mensaje(mejor_camion['tiempo_restante']) if mejor_camion else None,
                 'identificador_ruta': mejor_camion['identificador_ruta'] if mejor_camion else None
             }
     logging.info(f"Camión más cercano: {mejor_camion['camion_id']} con estado {mejor_camion['estado']}.")
@@ -104,7 +104,7 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
                 'estado': 'ya_paso_por_su_direccion',
                 'mensaje': mensaje,
                 'distancia_a_camion_km': round(geodesic((mejor_camion["latitud"], mejor_camion["longitud"]), (latitud_usuario, longitud_usuario)).km, 2),
-                'tiempo_estimado_llegada': mejor_camion['tiempo_restante'],
+                'tiempo_estimado_llegada': formatear_tiempo_a_mensaje(mejor_camion['tiempo_restante']),
                 'identificador_ruta': mejor_camion['identificador_ruta']
             }
         
