@@ -150,11 +150,19 @@ class Simulador:
         hora_inicio = info_turno["inicio"]
         hora_fin = info_turno["fin"]
 
-        #determinamos si estamos fuera de servicio
-        if hora_actual.time() < time (8,0):
+        #determinamos si estamos fuera de servicio solo si la hora actual no pertenece a ningún turno definido
+        en_servicio = any(
+            info["inicio"] <= hora_actual.time() <= info["fin"]
+            for info in TURNOS.values()
+        )
+
+        if not en_servicio:
             estado_global = 'fuera_de_servicio'
         else:
             estado_global = None
+
+        logging.info(f"Hora actual: {hora_actual.time()} - Estado global: {estado_global}")
+
 
 
         #lista para almacenar los reusltados de cada camion

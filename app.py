@@ -2,6 +2,7 @@ from datetime import datetime
 from flask import Flask, jsonify, request, render_template
 import os
 import logging
+from zoneinfo import ZoneInfo
 from flask_cors import CORS  # <--- agregado para CORS
 
 from BackEnd.zonas import (
@@ -27,6 +28,7 @@ app = Flask(__name__)
 
 # Habilitar CORS (puede ser CORS(app, origins=["http://localhost:5173"]) para limitar)
 CORS(app, origins=["https://basur-app.vercel.app"])
+
 app.config['SERVER_NAME'] = None  # Permite cualquier host
 
 # Rutas absolutas del proyecto y datos
@@ -116,8 +118,10 @@ def consultar_ubicacion():
         return jsonify({'mensaje': 'Tu dirección está en el área de servicio, pero no se pudo asignar a una zona específica.'})
 
     # 4: Calcular el tiempo de llegada del camión más cercano
-    hora_actual = datetime.now()
+    hora_actual = datetime.now(ZoneInfo("America/Argentina/Buenos_Aires"))
     posiciones_camiones = simulador_camiones.obtener_posicion_camion(zona, hora_actual)
+    logging.info(f"Hora local Argentina: {hora_actual}")
+
     logging.info(f"Posiciones de camiones para la zona {zona} a las {hora_actual}: {posiciones_camiones}")
 
     logging.info("Calculando tiempo estimado de llegada...")
@@ -129,4 +133,4 @@ def consultar_ubicacion():
 
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 4000))  # Usa el puerto de Render o 4000 local
-    app.run(debug=False, port=port, host='0.0.0.0')  # debug=False en producción
+    app.run(debug=True, port=port, host='0.0.0.0')  # debug=False en producción
