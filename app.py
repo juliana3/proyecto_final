@@ -16,6 +16,8 @@ from BackEnd.geocodificacion import geocodificar_direccion
 from BackEnd.simulador import Simulador, TURNOS
 from BackEnd.distancia import calcular_tiempo_a_destino
 from BackEnd.DEMO import es_direccion_demo, obtener_respuesta_demo
+from BackEnd.helpers import convertir_timedelta_a_str
+
 
 # Configuración del logging
 logging.basicConfig(
@@ -125,7 +127,7 @@ def consultar_ubicacion():
     logging.info(f"Posiciones de camiones para la zona {zona} a las {hora_actual}: {posiciones_camiones}")
 
     logging.info("Calculando tiempo estimado de llegada...")
-    resultado_distancia = calcular_tiempo_a_destino(lat_usuario, lon_usuario, posiciones_camiones)
+    resultado_distancia = convertir_timedelta_a_str(resultado_distancia)
     logging.info(f"Resultado del cálculo de distancia a la dirección {lat_usuario}, {lon_usuario}: {resultado_distancia}")
 
     return jsonify(resultado_distancia)
