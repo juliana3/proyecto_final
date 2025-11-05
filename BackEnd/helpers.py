@@ -1,5 +1,6 @@
 #funciones auxiliares
 import math
+from datetime import timedelta  
 
 def formatear_tiempo_a_mensaje(segundos):
     """
@@ -14,3 +15,14 @@ def formatear_tiempo_a_mensaje(segundos):
         horas = math.floor(segundos / 3600)
         minutos = math.floor((segundos % 3600) / 60)
         return f"🕒 El camión más cercano llegará en {horas} hora(s) y {minutos} minuto(s). ¡Tené todo listo!"
+
+
+def convertir_timedelta_a_str(obj):
+    """Convierte todos los timedelta dentro de dicts/listas a strings."""
+    if isinstance(obj, timedelta):
+        return str(obj)
+    if isinstance(obj, dict):
+        return {k: convertir_timedelta_a_str(v) for k, v in obj.items()}
+    if isinstance(obj, list):
+        return [convertir_timedelta_a_str(i) for i in obj]
+    return obj
