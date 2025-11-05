@@ -27,14 +27,16 @@ def calcular_horario_turno(hora_actual, hora_inicio, hora_fin):
     """
     Calcula los datetimes de inicio y fin de un turno, considerando turnos que cruzan la medianoche.
     """
-    inicio = datetime.combine(hora_actual.date(), hora_inicio)
-    fin = datetime.combine(hora_actual.date(), hora_fin)
+    tz = hora_actual.tzinfo #mantener la zona horaria del datetime proporcionado
+
+    inicio = datetime.combine(hora_actual.date(), hora_inicio, tzinfo=tz)
+    fin = datetime.combine(hora_actual.date(), hora_fin, tzinfo=tz)
 
     if hora_inicio > hora_fin:  # caso turno cruzando medianoche
         if hora_actual.time() < hora_fin:
-            inicio = datetime.combine(hora_actual.date() - timedelta(days=1), hora_inicio)
+            inicio = datetime.combine(hora_actual.date() - timedelta(days=1), hora_inicio, tzinfo=tz)
         else:
-            fin = datetime.combine(hora_actual.date() + timedelta(days=1), hora_fin)
+            fin = datetime.combine(hora_actual.date() + timedelta(days=1), hora_fin, tzinfo=tz)
 
     return inicio, fin
 
