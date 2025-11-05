@@ -127,8 +127,14 @@ def consultar_ubicacion():
     logging.info(f"Posiciones de camiones para la zona {zona} a las {hora_actual}: {posiciones_camiones}")
 
     logging.info("Calculando tiempo estimado de llegada...")
+    resultado_distancia = calcular_tiempo_a_destino(lat_usuario, lon_usuario, posiciones_camiones)
+
+    if not resultado_distancia:
+        logging.error("Error: calcular_tiempo_a_destino devolvió None o un valor vacío.")
+        return jsonify({'mensaje': 'No se pudo calcular el tiempo estimado de llegada.'}), 500
+
+    # Solo si existe, lo convertís
     resultado_distancia = convertir_timedelta_a_str(resultado_distancia)
-    logging.info(f"Resultado del cálculo de distancia a la dirección {lat_usuario}, {lon_usuario}: {resultado_distancia}")
 
     return jsonify(resultado_distancia)
 
