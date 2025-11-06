@@ -121,7 +121,17 @@ def calcular_tiempo_a_destino(latitud_usuario, longitud_usuario, posiciones_cami
         tiempo_restante_camion = mejor_camion["tiempo_restante"]
         tiempo_estimado_usuario = tiempo_restante_camion * proporcion_distancia_hasta_usuario
         
-        mensaje_tiempo = formatear_tiempo_a_mensaje(tiempo_estimado_usuario.total_seconds())
+        #mensaje_tiempo = formatear_tiempo_a_mensaje(tiempo_estimado_usuario.total_seconds())
+        if hasattr(tiempo_estimado_usuario, "total_seconds"):
+            segundos = tiempo_estimado_usuario.total_seconds()
+        else:
+            try:
+                segundos = float(tiempo_estimado_usuario)
+            except (ValueError, TypeError):
+                segundos = 0
+                
+        mensaje_tiempo = formatear_tiempo_a_mensaje(segundos)
+
         return {
             'camion_id': mejor_camion['camion_id'],
             'distancia_a_camion_km': round(geodesic((mejor_camion["latitud"], mejor_camion["longitud"]), (latitud_usuario, longitud_usuario)).km, 2),

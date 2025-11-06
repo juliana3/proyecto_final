@@ -6,6 +6,11 @@ def formatear_tiempo_a_mensaje(segundos):
     """
     Función auxiliar para formatear un tiempo en segundos a un mensaje legible.
     """
+
+    # Si es un timedelta, convertirlo a segundos
+    if hasattr(segundos, "total_seconds"):
+        segundos = segundos.total_seconds()
+
     if segundos < 60:
         return "🚛 ¡El camión está a punto de llegar a tu dirección, en menos de 1 minuto!"
     elif segundos < 3600:  # Menos de una hora
