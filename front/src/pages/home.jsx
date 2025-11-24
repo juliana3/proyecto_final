@@ -17,7 +17,7 @@ export default function Home() {
 
   if (!isInStandaloneMode) {
     const timer = setTimeout(() => {
-      alert("📲 Para una mejor experiencia, instalá la app desde el ícono en la barra de dirección. ¡Es rápido y fácil!")
+      alert("📲 Para una mejor experiencia, instalá la app. Para instalar desde el movil ubica los 3 puntitos en la parte superior derecha y baja hasta encontrar agregar a pantalla principal y luego aceptar, sino desde el ícono en la barra de dirección. ¡Es rápido y fácil!")
     }, 6000)
     return () => clearTimeout(timer)
   }
