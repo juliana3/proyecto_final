@@ -22,7 +22,13 @@ export default function Formulario() {
       const res = await api.post("/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
-      setResultado("🚫 Error de conexión. Intentalo más tarde.");
+      if (err.response && err.response.data && err.response.data.mensaje) {
+        // El backend respondió con 404, 400, etc. pero con un mensaje válido
+        setResultado(err.response.data.mensaje);
+      } else {
+        // Error REAL de conexión o CORS
+        setResultado("🚫 Error de conexión. Intentalo más tarde.");
+      }
     }
 
     // timer de inactividad y reinicio
