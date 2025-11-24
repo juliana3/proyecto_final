@@ -19,8 +19,13 @@ export default function Ubicacion() {
       const res = await api.post("/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
-      setResultado("🚫 Error de conexión. Intentalo más tarde.");
+      if (err.response && err.response.data && err.response.data.mensaje) {
+        setResultado(err.response.data.mensaje); // mensaje real del backend
+      } else {
+        setResultado("🚫 Error de conexión. Intentalo más tarde.");
+      }
     }
+
 
     //timer para cerrar por inectividad y cambiar de modal
     setTimeout(() => {
