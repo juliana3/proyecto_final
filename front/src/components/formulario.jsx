@@ -22,7 +22,7 @@ export default function Formulario() {
       const res = await api.post("/consultar_ubicacion", datos);
       mostrarResultadoSegunEstado(res.data);
     } catch (err) {
-      setResultado("🚫 Error de conexión. Intentalo más tarde.");
+      //setResultado("🚫 Error de conexión. Intentalo más tarde.");
     }
 
     // timer de inactividad y reinicio
