@@ -37,10 +37,29 @@ def geocodificar_direccion(direccion_usuario):
         data = response.json()
 
         if data["results"]:
-            lat = data["results"][0]["geometry"]["lat"]
-            lon = data["results"][0]["geometry"]["lng"]
-            logging.info(f"Coordenadas encontradas: Latitud = {lat}, Longitud = {lon}")
+            result = data["results"][0]
+
+            # Nivel de confianza (0 a 10)
+            confidence = result.get("confidence", 0)
+            components = result.get("components", {})
+
+            # Coordenadas
+            lat = result["geometry"]["lat"]
+            lon = result["geometry"]["lng"]
+
+            # Validación 1: confianza baja
+            if confidence < 5:
+                logging.warning(f"Resultado poco confiable (confidence={confidence}).")
+                return None
+
+            # Validación 2: dirección demasiado genérica (no tiene calle)
+            if "road" not in components:
+                logging.warning("La dirección encontrada es demasiado genérica (no contiene calle).")
+                return None
+
+            logging.info(f"Coordenadas encontradas: Lat = {lat}, Lon = {lon} (conf={confidence})")
             return (lat, lon)
+
         else:
             logging.warning("No se encontraron resultados en OpenCage.")
             return None
