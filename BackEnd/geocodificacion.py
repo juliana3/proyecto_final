@@ -13,7 +13,7 @@ def geocodificar_direccion(direccion_usuario):
     """ Convierte la direccion de texto a coordenadas (lat y lon). Tambien agrega automaticamente ciudad y pasi automaticamente.
     Devuelve una tupla con la latitud y longitud o un None"""
 
-    geolocator = Nominatim(user_agent="BasureroApp")
+    geolocator = Nominatim(user_agent="BasureroApp/1.0 (araujojuli1234@gmail.com)")
     direccion_completa = f"{direccion_usuario}, Santa Fe capital, Santa Fe, Argentina"
     logging.info(f"Geocodificando la direccion: '{direccion_completa}'")
 
