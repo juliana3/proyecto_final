@@ -8,7 +8,7 @@ logging.basicConfig(
     format="%(asctime)s [%(levelname)s] %(message)s"
 )
 
-API_KEY = os.getenv("OPENCAGE_API_KEY") 
+API_KEY = os.getenv("OPENCAGE_API_KEY")  
 
 def geocodificar_direccion(direccion_usuario):
     """
