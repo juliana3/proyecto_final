@@ -49,12 +49,12 @@ def geocodificar_direccion(direccion_usuario):
 
             # Validación 1: confianza baja
             if confidence < 5:
-                logging.warning(f"Resultado poco confiable (confidence={confidence}).")
+                logging.info(f"Resultado poco confiable (confidence={confidence}).")
                 return None
 
             # Validación 2: dirección demasiado genérica (no tiene calle)
             if "road" not in components:
-                logging.warning("La dirección encontrada es demasiado genérica (no contiene calle).")
+                logging.info("La dirección encontrada es demasiado genérica (no contiene calle).")
                 return None
 
             logging.info(f"Coordenadas encontradas: Lat = {lat}, Lon = {lon} (conf={confidence})")
